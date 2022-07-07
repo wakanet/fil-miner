@@ -9,7 +9,7 @@ doc/advance.md
 
 fild构建
 ```
-go install github.com/gwaycc/supd/cmd/supd
+go install github.com/gwaycc/supd/cmd/supd@latest
 mv bin/supd bin/fild
 ```
 
