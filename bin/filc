@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sudo PRJ_ROOT=$PRJ_ROOT $PRJ_ROOT/bin/fild -c $PRJ_ROOT/etc/supd/supd.ini ctl "$@"

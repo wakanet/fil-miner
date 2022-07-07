@@ -1,0 +1,5 @@
+# auto withdraw configuration
+IntervalEpoch=0 # 0 not open the function
+SendToAddr=""
+WithdrawAmount="100"
+KeepOwnerAmount="5"

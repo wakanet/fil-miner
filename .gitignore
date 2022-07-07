@@ -1,0 +1,12 @@
+/var
+/publish
+/apps.bak
+go.sum
+#pgk
+/vendor
+# idea ignore
+/.idea
+
+# idea ignore
+.DS_Store
+

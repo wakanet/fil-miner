@@ -1,0 +1,16 @@
+[Unit]
+Description=Supervisor process control system for UNIX
+Documentation=https://github.com/ochinchina/supervisord
+After=network.target
+
+[Service]
+Environment="PRJ_ROOT=$PRJ_ROOT"
+ExecStart=$PRJ_ROOT/bin/fild -c $PRJ_ROOT/etc/supd/supd.ini
+ExecStop=$PRJ_ROOT/bin/fild ctl shutdown
+ExecReload=$PRJ_ROOT/bin/fild ctl reload
+KillMode=process
+Restart=on-failure
+RestartSec=50s
+
+[Install]
+WantedBy=multi-user.target
