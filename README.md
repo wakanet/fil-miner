@@ -13,4 +13,12 @@ go install github.com/gwaycc/supd/cmd/supd
 mv bin/supd bin/fild
 ```
 
-开发请阅读源码中的开发文档
+二进制发布
+```
+. env.sh
+sup publish all
+cd publish
+tar -czf fil-miner-linux-amd64-mainnet-v1.xx.xx.tar.gz
+```
+
+lotus构建请阅读lotus源码中的开发文档
