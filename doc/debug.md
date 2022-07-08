@@ -128,6 +128,11 @@ lotus-storage-0  lotus-worker-1  lotus-worker-wdpost(wnpost)
 ```
 cd ~/fil-miner
 . env.sh
+
+cp etc/supd/apps/tpl/lotus-daemon-1.ini etc/supd/apps # 准备lotus链进程
+filc reload
+filc status
+
 filc start lotus-daemon-1
 cd script/lotus/lotus-user
 . env/lotus-1.sh # 切换lotus.sh的环境变量指向到lotus-daemon-1
@@ -140,11 +145,16 @@ cd script/lotus/lotus-user
 ```
 cd ~/fil-miner
 . env.sh
+
+cp etc/supd/apps/tpl/lotus-user-1.ini etc/supd/apps # 准备miner进程
+filc reload 
+filc status
+
 cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh
 ./lotus.sh wallet new bls # 创建一个t3钱包地址
-curl http://120.78.167.238:7777/send?address=上面的钱包地址
+curl http://debug.filecoin.lib10.cn:7777/send?address=上面的钱包地址
 ./lotus.sh wallet list # 确认水龙头的钱到帐号，可以创建miner
 ./miner.sh init --owner=t3xxx --sector-size=2KiB
 
@@ -160,6 +170,11 @@ filc status # 确认lotus-user-1进程状态是绿的
 ```
 cd ~/fil-miner
 . env.sh
+
+cp etc/supd/apps/tpl/lotus-storage-0.ini etc/supd/apps # 准备存储服务器进程
+filc reload
+filc status
+
 cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh
@@ -182,6 +197,11 @@ filc restart lotus-storage-0 # 删除配置文件后重启lotus-storage-0服务
 # 以下依赖于lotus-user-1已启动并且./miner.sh fstar-storage status有正常节点
 cd ~/fil-miner
 . env.sh
+
+cp etc/supd/apps/tpl/lotus-user-1.ini etc/supd/apps # 准备miner进程
+filc reload
+filc status
+
 cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh
@@ -201,6 +221,11 @@ filc tail lotus-worker-1 stderr -f # 查看lotus-worker-1的密封过程,或tail
 ```
 cd ~/fil-miner
 . env.sh
+
+cp etc/supd/apps/tpl/lotus-user-wdpost.ini etc/supd/apps # 准备wdpost进程
+filc reload
+filc status
+
 cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh
@@ -214,6 +239,11 @@ filc start lotus-worker-wdpost # 启动进程级wdpost工人
 ```
 cd ~/fil-miner
 . env.sh
+
+cp etc/supd/apps/tpl/lotus-user-wnpost.ini etc/supd/apps # 准备wnpost进程
+filc reload
+filc status
+
 cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh

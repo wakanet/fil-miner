@@ -39,7 +39,7 @@ nfs, fuse会自动管理挂载, CUSTOM需要人工挂载，具体需要开发支
 
 ### 通用依赖安装
 ```
-sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev libcuda1
+sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
 ```
 
 ### 显卡驱动安装
