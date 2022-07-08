@@ -29,7 +29,7 @@
 ** 不需要root，但需要sudo权限 **
 
 # 安装依赖(不需安装显卡驱动)
-sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev libcuda1
+sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
 
 # 创建数据目录
 sudo mkdir -p /data
