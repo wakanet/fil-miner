@@ -154,7 +154,7 @@ cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh
 ./lotus.sh wallet new bls # 创建一个t3钱包地址
-curl http://debug.filecoin.lib10.cn:7777/send?address=上面的钱包地址
+curl http://debug.lotus.lib10.cn:7777/send?address=上面的钱包地址
 ./lotus.sh wallet list # 确认水龙头的钱到帐号，可以创建miner
 ./miner.sh init --owner=t3xxx --sector-size=2KiB
 
