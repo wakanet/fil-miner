@@ -99,12 +99,11 @@ cd ~/fil-miner
 rm etc/supd/apps/*.ini # 清除需要启动的进程
 cp etc/supd/apps/tpl/lotus-daemon-1.ini etc/supd/apps # 准备lotus链进程
 cp etc/supd/apps/tpl/lotus-user-1.ini etc/supd/apps # 准备miner进程
-cp etc/supd/apps/tpl/lotus-user-wdpost.ini etc/supd/apps # 准备wdpost进程
 cp etc/supd/apps/tpl/lotus-user-wnpost.ini etc/supd/apps # 准备wnpost进程
 
 # 将以上配置文件加载到fil-miner中管理
 filc reload
-filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wdpost, lotus-worker-wnpost
+filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wnpost
 
 cd script/lotus/lotus-user
 . env/lotus-1.sh
@@ -118,8 +117,7 @@ filc start lotus-user-1
 ./tailf-miner.sh # 确认miner正常启动，需要几分钟校验参数包数据
 ./miner.sh info # 确认miner启动成功
 
-filc start lotus-worker-wdpost # 启动单独的wdpost工人，以便可以专用显卡计算
-filc start lotus-worker-wnpost # 启动单独的wnpost工人，此工人只会使用CPU计算，不会抢占GPU
+filc start lotus-worker-wnpost # 启动单独的wnpost工人, 当worker不存在时，lotus-user-1会使用内置的wnpost进行计算
 ```
 
 ## 运行备节点
@@ -140,11 +138,10 @@ rm etc/supd/apps/*.ini # 清除需要启动的进程
 cp etc/supd/apps/tpl/lotus-daemon-1.ini etc/supd/apps # 准备lotus链进程
 cp etc/supd/apps/tpl/lotus-user-1.ini etc/supd/apps # 准备miner进程
 cp etc/supd/apps/tpl/lotus-user-wdpost.ini etc/supd/apps # 准备wdpost进程
-cp etc/supd/apps/tpl/lotus-user-wnpost.ini etc/supd/apps # 准备wnpost进程
 
 # 将以上配置文件加载到fil-miner中管理
 filc reload
-filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wdpost, lotus-worker-wnpost
+filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wdpost
 
 cd script/lotus/lotus-user
 . env/lotus-1.sh
@@ -161,49 +158,84 @@ filc start lotus-daemon-1
 /data/sdb/lotus-user-1/.lotusminer/worker_api
 指向主节点
 
-filc start lotus-worker-wdpost # 连接主节点进行wdpost双计算保证主节点运行
-filc start lotus-worker-wnpost #  连接主节点进行wnpost双计算保证主节点运行
+filc start lotus-worker-wdpost # 连接主节点进行wdpost计算，当备机异常时，主节点的lotus-user-1会自动承担起计算
 
-filc status # 此时备节点运行: lotus-daemon-1, lotus-worker-wdpost, lotus-worker-wnpost
+filc status # 此时备节点运行: lotus-daemon-1, lotus-worker-wdpost
 ```
 ## 日常链快照
 应找一台专用链机器，用于日常快照生成  
-TODO: 更多细节
+
+执行快照导出
+```
+/root/fil-miner/apps/lotus/lotus --repo=/data/cache/.lotus chain export --recent-stateroots=900 --skip-old-msgs=true /data/download/lotus_chain_tmp.car
+```
+
+自动执行的脚本
+```
+#!/bin/sh
+
+echo `date`>/data/download/export-chain.log
+
+/root/fil-miner/apps/lotus/lotus --repo=/data/cache/.lotus chain export --recent-stateroots=900 --skip-old-msgs=true /data/download/lotus_chain_tmp.car
+
+if [ -f lotus_chain_snapshot.car ]; then
+  mv -v lotus_chain_snapshot.car lotus_chain_snapshot.car.bak
+fi
+if [ -f lotus_chain_tmp.car ]; then
+  mv -v lotus_chain_tmp.car lotus_chain_snapshot.car
+fi
+
+echo `date`>>/data/download/export-chain.log
+echo "export lotus_chain_snapshot.car done"
+```
+
+自动每天02点执行快照导出
+```
+crontab -e
+0 14 * * * sh -x /data/download/export-chain.sh >>/data/download/export-chain.log
+```
+
+链快照裁剪
+```
+# 下载链快照
+wget http://10.202.89.95:8081/download/lotus_chain_snapshot.car
+
+# 确认当前链没有程序在用，关闭链程序; 
+# 生产部署中若是主节点的链需要裁剪，应进行主备切换变备节点处于空闲后再裁减
+cd ~/fil-miner
+. env.sh
+
+# 停止程序
+filc status
+filc stop lotus-daemon-1
+filc status # 确认链程序停止(ps aux|grep "lotus"也可以确认)
+
+# 导入快照
+cd script/lotus/lotus-user
+. env/lotus-1.sh
+cat export-chain.sh
+mv /data/cache/.lotus/datastore /data/cache/.lotus/datastore.bak # 备份原链数据
+./lotus.sh daemon --import-snapshot ./lotus_chain_snapshot.car --halt-after-import # 导入快照
+filc start lotus-daemon-1 # 启动链
+filc status # 确认链已启动
+./lotus.sh sync status #  确认链同步成
+
+# 删除原链的块数据文件
+rm -rf /data/cache/.lotus/datastore.bak
+```
 
 ## 主备切换
 
 ### 日常主备切换
 日常主备切换作用在于裁剪链、主备可用性验证操作，可定时执行。
 
+主备切换需将主节点与备节点的部署进程互换即可，正常主备切换应在wdpost空窗期进行
+
 切换前准备工作  
 ```
-1. 确认链是正常的
+1. 确认链是正常的, 且miner使用的私钥都存在
 2. 确认/data/sdb/lotus-user-1/.lotusminer/config.toml的API配置文件是本机的
 3. 如果扇区在密封中，需停止密封后，从主节点上同步.lotusminer过来改, 否则需要因扇区数据不致需要走损坏恢复流程
-```
-
-备节点进行链裁剪
-```
-cd ~/fil-miner
-. env.sh # 加载全局环境变量
-cd script/lotus/lotus-user
-. env/lotus-1.sh
-. env/miner-1.sh
-
-cd script/lotus/lotus-user
-# 复制链快照到此目录下
-cat export-chain.sh # 里边有恢复文档
-filc stop lotus-daemon-1 # 停止原服务
-filc status # 确认链已停止
-
-mv /data/cache/.lotus/datastore /data/cache/.lotus/datastore.bak # 备份原链数据
-
-./lotus.sh daemon --import-snapshot ./lotus_chain_20220705.car --halt-after-import # 导入快照
-filc start lotus-daemon-1 # 启动链
-filc status # 确认链已启动
-./lotus.sh sync status #  确认链同步成功
-
-# rm -rf /data/cache/.lotus/datastore.bak
 ```
 
 开两个窗口，一个打开主节点，一个打开备节点  
@@ -219,7 +251,7 @@ cd script/lotus/lotus-user
 filc stop lotus-user-1 # 注意!!!!一定在wdpost结果提交成功后再执行
 
 
-# 二，以下在备节点上操作
+# 二，以下在备节点上操作变主节点
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
 cd script/lotus/lotus-user
@@ -230,14 +262,22 @@ cd script/lotus/lotus-user
 
 filc start lotus-user-1
 ./tailf-miner.sh # 确认日志正常
-filc status # 会显示lotus-worker-wdpost与lotus-worker-wnpost会自动启动起来
+filc status  
 
-# 三，将主节改为备节点
-# 改动/data/sdb/lotus-user-1/.lotusminer/config.toml指向本本，worker_api指向备用机, worker_api指向备用机后
-# lotus-worker-wdpost, lotus-worker-wdpost会自动起来
-＃可以切换成主节点上的备节点运行./miner.sh fstar-worker list进行确认
+# 三，恢复主备对应的worker
+# 改动/data/sdb/lotus-user-1/.lotusminer/config.toml指向本机,以备下次应急启动备节点，
+# 确认worker_api指向主节点ip
 
-# 完成日常主备切换
+# 在主节点恢复启动wnpost
+filc status
+filc start lotus-worker-wnpost
+filc stop lotus-worker-wdpost # 恢复到主节点节部署
+filc status
+
+# 在备节点上恢复启动wdpost
+filc status
+filc start lotus-worker-wdpost
+filc stop lotus-worker-wnpost
 ```
 
 ### 灾难切换
@@ -273,14 +313,17 @@ filc status # 会显示lotus-worker-wdpost与lotus-worker-wnpost会自动启动�
 ## 升级节点
 以下为通用升级方式，特殊的再另行说明
 ```
-wget https://github.com/wakanet/fil-miner/release/xxx.tar.gz
+# 注意版本号对应不同的包
+cd ~
+wget -c http://10.202.89.95:8081/download/fil-miner-linux-amd64-mainnet-v1.16.0-patch5.tar.gz
+
 
 # 在fil-miner边上直接解压覆盖，注意:覆盖会对已存在的文件进行替换操作，请注意自行保存已修改过的文件
 tar -xzf xxx.tar.gz # 会直接覆盖fil-miner文件目录
 
 cd fil-miner
 . env.sh
-filc restart # 选择适当的重启时间窗口重启程序
+filc restart xxx # 选择适当的重启时间窗口重启需要升级的程序
 ```
 
 ## 灾难恢复
