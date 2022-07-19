@@ -154,9 +154,9 @@ cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh
 ./lotus.sh wallet new bls # 创建一个t3钱包地址
-curl http://debug.lotus.lib10.cn:7777/send?address=上面的钱包地址
+./lotus.sh wallet list # 将钱包地址发管理员要测试币
 ./lotus.sh wallet list # 确认水龙头的钱到帐号，可以创建miner
-./miner.sh init --owner=t3xxx --sector-size=2KiB
+./miner.sh init --sector-size=2KiB
 
 # 以上init成功后可以开始运行miner, init只需在首次创建时使用
 filc status
@@ -222,7 +222,7 @@ filc tail lotus-worker-1 stderr -f # 查看lotus-worker-1的密封过程,或tail
 cd ~/fil-miner
 . env.sh
 
-cp etc/supd/apps/tpl/lotus-user-wdpost.ini etc/supd/apps # 准备wdpost进程
+cp etc/supd/apps/tpl/lotus-worker-wdpost.ini etc/supd/apps # 准备wdpost进程
 filc reload
 filc status
 
@@ -240,7 +240,7 @@ filc start lotus-worker-wdpost # 启动进程级wdpost工人
 cd ~/fil-miner
 . env.sh
 
-cp etc/supd/apps/tpl/lotus-user-wnpost.ini etc/supd/apps # 准备wnpost进程
+cp etc/supd/apps/tpl/lotus-worker-wnpost.ini etc/supd/apps # 准备wnpost进程
 filc reload
 filc status
 
