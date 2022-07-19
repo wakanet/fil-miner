@@ -156,7 +156,7 @@ cd script/lotus/lotus-user
 ./lotus.sh wallet new bls # 创建一个t3钱包地址
 ./lotus.sh wallet list # 将钱包地址发管理员要测试币
 ./lotus.sh wallet list # 确认水龙头的钱到帐号，可以创建miner
-./miner.sh init --sector-size=2KiB
+./miner.sh init --owner=t3xxx(上面创建的钱包地址) --sector-size=2KiB
 
 # 以上init成功后可以开始运行miner, init只需在首次创建时使用
 filc status
