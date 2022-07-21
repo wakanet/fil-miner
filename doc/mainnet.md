@@ -256,12 +256,20 @@ rm -rf /data/cache/.lotus/datastore.bak
 
 主备切换需将主节点与备节点的部署进程互换即可，正常主备切换应在wdpost空窗期进行
 
-切换前准备工作  
-```
+切换前备节准备工作
 1. 确认链是正常的, 且miner使用的私钥都存在
 ```
+cd ~/fil-miner
+. env.sh
+cd script/lotus/lotus-user
+. env/lotus-1.sh
+. env/miner-1.sh
 
-预启动备节点的miner信息，检查看是否能正常启动
+./lotus.sh sync status # 确认链同步正常
+./lotus.sh wallet list # 确认miner对应的钱包密钥存在
+```
+
+2. 预启动备节点的miner信息，检查看是否能正常启动
 ```
 # 主节点
 cd /data/sdb/lotus-user-1/
@@ -306,7 +314,7 @@ vim /data/sdb/lotus-user-1/.lotusminer/config.toml
 # 准备结束
 ```
 
-开始切换  
+3. 开始切换  
 开两个窗口，一个打开主节点，一个打开备节点  
 ```
 
