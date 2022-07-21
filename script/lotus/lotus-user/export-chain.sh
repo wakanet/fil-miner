@@ -1,7 +1,23 @@
 #!/bin/sh
 
-./lotus.sh chain export --recent-stateroots=900 --skip-old-msgs=true lotus_chain_$(date +%Y%m%d).car
-echo "export lotus_chain_$(date +%Y%m%d).car done"
+dl_dir=/data/download
+
+mkdir -p $dl_dir
+
+echo `date`>$dl_dir/export-chain.log
+
+./lotus.sh chain export --recent-stateroots=900 --skip-old-msgs=true $dl_dir/lotus_chain_tmp.car
+
+if [ -f $dl_dir/lotus_chain_snapshot.car ]; then
+  mv -v $dl_dir/lotus_chain_snapshot.car $dl_dir/lotus_chain_snapshot.car.bak
+fi
+if [ -f $dl_dir/lotus_chain_tmp.car ]; then
+  mv -v $dl_dir/lotus_chain_tmp.car $dl_dir/lotus_chain_snapshot.car
+fi
+
+echo `date`>>$dl_dir/export-chain.log
+echo "export lotus_chain_snapshot.car done"
+
 
 # 从快照恢复指南
 # Start lotus with the export chain

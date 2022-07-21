@@ -1,4 +1,4 @@
-# 生产主备部署(真实环境)
+# 生产主备部署
 
 此为生产环境下使用的部署，使用此文档前应掌握debug.md文档部署.
 
@@ -7,7 +7,8 @@
 - [软件安装](#软件安装)
 - [运行主节点](#运行主节点)
 - [运行备节点](#运行备节点)
-- [日常链快照](#日常链快照)
+- [运行工人节点](#运行工人节点)
+- [生成链快照](#生成链快照)
 - [主备切换](#主备切换)
   - [日常切换](##日常切换)
   - [灾难切换](##灾难切换)
@@ -17,6 +18,7 @@
   - [重建miner](#重建miner)
 
 ## 硬件要求
+**此为32GB, 64GB扇区要求，模拟环境2KB扇区同debug.md的硬件要求**
 ```
 两台真实miner主机, 配置：
 
@@ -35,7 +37,7 @@ nfs, fuse会自动管理挂载, CUSTOM需要人工挂载，具体需要开发支
 ```
 
 ## 软件安装
-** 不需要root，但需要sudo权限 **
+**不需要root，但需要sudo权限**
 
 ### 通用依赖安装
 ```
@@ -43,18 +45,20 @@ sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc b
 ```
 
 ### 显卡驱动安装
+**2k环境不需要安装此显卡要求**
 因此当前版本要求使用CUDA进行算法运算，需要安装测试过的显卡驱动包.  
 显卡驱动Nouveau安装失败的问题  
 https://ld246.com/article/1378012262086
 ```
 sudo su -
 cd ~
+# 内网或通过官方下载驱动包, 以下是官方地址
 wget https://developer.nvidia.cn/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=runfile_local
 
+# 禁用nouveau, 不然显卡重启动会起不来。
 cp /etc/modprobe.d/nvidia-installer-disable-nouveau.conf ~/nvidia-installer-disable-nouveau.conf
 echo "blacklist nouveau">/etc/modprobe.d/nvidia-installer-disable-nouveau.conf
 echo "options nouveau modeset=0">/etc/modprobe.d/nvidia-installer-disable-nouveau.conf
-
 update-initramfs -u
 update-grub
 
@@ -74,8 +78,10 @@ export LD_LIBRARY_PATH=/usr/local/cuda-11.6/lib64:$LD_LIBRARY_PATH
 ```
 
 ### 下载主网的fil-miner
+**2KB模拟环境不需要再下载此包，需要注意产生与模拟环境一个是mainnet版本，一个是debug版本。**
 ```
 # 下载release版的fil-miner-linux-amd64-mainnet-xxx.tar.gz
+# 在https://github.com/wakanet/fil-miner/release/找到下载包
 tar -xzf fil-miner-linux-amd64-mainnet-xxx.tar.gz
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
@@ -86,9 +92,7 @@ cd ~/fil-miner
 
 准备以下数据
 ```
-/data/cache/filecoin-proof-parameters/v28/ # 需事先下载
-/data/cache/.lotus # # 用已经有的或从快照中恢复
-/data/sdb/lotus-user-1/.lotusminer # 复制已有的过来，没有需要通过init新建
+/data/cache/filecoin-proof-parameters/v28/ # 需事先下载, 2KB模拟环境可自动下载, 32GB, 64GB需要很大的参数包。
 ```
 
 运行程序
@@ -100,10 +104,11 @@ rm etc/supd/apps/*.ini # 清除需要启动的进程
 cp etc/supd/apps/tpl/lotus-daemon-1.ini etc/supd/apps # 准备lotus链进程
 cp etc/supd/apps/tpl/lotus-user-1.ini etc/supd/apps # 准备miner进程
 cp etc/supd/apps/tpl/lotus-user-wnpost.ini etc/supd/apps # 准备wnpost进程
+cp etc/supd/apps/tpl/lotus-user-wdpost.ini etc/supd/apps # 准备wdpost进程
 
 # 将以上配置文件加载到fil-miner中管理
 filc reload
-filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wnpost
+filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wnpost, lotus-worker-wdpost
 
 cd script/lotus/lotus-user
 . env/lotus-1.sh
@@ -113,20 +118,36 @@ filc start lotus-daemon-1
 ./lotus.sh sync status # 确认链同步正常
 ./lotus.sh wallet list # 确认钱包正常，没有就需要导入
 
-filc start lotus-user-1
+# 通过快照裁剪链(若链已正常，可跳过此步)
+filc stop lotus-daemon-1
+filc status # 确认链已关闭
+mv /data/cache/.lotus/datastore /data/cache/.lotus/datastore.bak # 备份原链数据
+./lotus.sh daemon --import-snapshot ./lotus_chain_20220705.car --halt-after-import # 导入快照, 参考`cat ./export-chain.sh`
+filc start lotus-daemon-1 # 启动链
+filc status # 确认链已启动
+
+# 启动lotus-user-1进程
+# 启动前需确认是新miner还是老miner
+# 新miner需要参考debug.md文档进行./miner.sh init操作
+# 老miner若有/data/sdb/lotus-user-1/.lotusminer的数据，复制过来到相同的目录下;
+# 老miner若若没有.lotusminer目录的数据，则走后面章节的灾难重建流程
+filc start lotus-user-1 # 注意启动此进程前已有.lotusminer目录的数据
 ./tailf-miner.sh # 确认miner正常启动，需要几分钟校验参数包数据
 ./miner.sh info # 确认miner启动成功
 
-filc start lotus-worker-wnpost # 启动单独的wnpost工人, 当worker不存在时，lotus-user-1会使用内置的wnpost进行计算
+# 启动单独的wnpost工人, 当worker不存在时，lotus-user-1会使用内置的wnpost进行计算
+filc start lotus-worker-wnpost 
+
+filc status
+ # 此时lotus-daemon-1, lotus-user-1, lotus-worker-wnpost正常运行中
+ # lotus-worker-wdpost停止运行中，后面主备切换用到
 ```
 
 ## 运行备节点
 
 准备以下数据
 ```
-/data/cache/filecoin-proof-parameters/v28/ # 需事先下载
-/data/cache/.lotus # # 用已经有的或从快照中恢复
-/data/sdb/lotus-user-1/.lotusminer # 从主节点整个复制过来, 若主节点已损坏，需要走恢复流程, 详见[灾难恢复](#灾难恢复)
+/data/cache/filecoin-proof-parameters/v28/ # 从主节点上复制过来或从专用下载机复制过来
 ```
 
 运行程序
@@ -137,11 +158,12 @@ cd ~/fil-miner
 rm etc/supd/apps/*.ini # 清除需要启动的进程
 cp etc/supd/apps/tpl/lotus-daemon-1.ini etc/supd/apps # 准备lotus链进程
 cp etc/supd/apps/tpl/lotus-user-1.ini etc/supd/apps # 准备miner进程
+cp etc/supd/apps/tpl/lotus-user-wnpost.ini etc/supd/apps # 准备wnpost进程
 cp etc/supd/apps/tpl/lotus-user-wdpost.ini etc/supd/apps # 准备wdpost进程
 
 # 将以上配置文件加载到fil-miner中管理
 filc reload
-filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wdpost
+filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wnpost, lotus-worker-wdpost
 
 cd script/lotus/lotus-user
 . env/lotus-1.sh
@@ -151,42 +173,43 @@ filc start lotus-daemon-1
 ./lotus.sh sync status # 确认链同步正常
 ./lotus.sh wallet list # 确认钱包正常，没有就需要导入
 
-# 不需启动lotus-user-1，但要事先确认以下配置是正确的
-/data/sdb/lotus-user-1/.lotusminer/config.toml
-[API]地址指向本机
+# 通过快照裁剪链(若链已正常，可跳过此步)
+filc stop lotus-daemon-1
+filc status # 确认链已关闭
+mv /data/cache/.lotus/datastore /data/cache/.lotus/datastore.bak # 备份原链数据
+./lotus.sh daemon --import-snapshot ./lotus_chain_20220705.car --halt-after-import # 导入快照, 参考`cat ./export-chain.sh`
+filc start lotus-daemon-1 # 启动链
+filc status # 确认链已启动
 
-/data/sdb/lotus-user-1/.lotusminer/worker_api
-指向主节点
+
+# 构建/data/sdb/lotus-user-1/.lotusminer目录
+# 方式一：
+# 从主节点同步过来，这是常用方式一
+# 方式二:
+# 灾难重建，详见后面章节点的灾难重建
+
+
+# 不需启动lotus-user-1，但要事先确认以下配置是正确的
+# /data/sdb/lotus-user-1/.lotusminer/config.toml
+# [API]
+# listen: 地址指向本机
+
+# 修改worker_api 指向主节点
+vim /data/sdb/lotus-user-1/.lotusminer/worker_api
 
 filc start lotus-worker-wdpost # 连接主节点进行wdpost计算，当备机异常时，主节点的lotus-user-1会自动承担起计算
 
-filc status # 此时备节点运行: lotus-daemon-1, lotus-worker-wdpost
+filc status 
+# lotus-daemon-1, lotus-worker-wdpost 运行中
+# lotus-user-1, lotus-worker-wnpost 停止中备用中
 ```
-## 日常链快照
-应找一台专用链机器，用于日常快照生成  
 
-执行快照导出
+## 生成链快照
+因产生的链数据大，应找一台专用链机器，用于日常快照生成  
+
+./export-chain.sh执行快照导出, 或参考./export-chain.sh生成新的脚本注意修改lotus可执行程序的位置指向
 ```
 /root/fil-miner/apps/lotus/lotus --repo=/data/cache/.lotus chain export --recent-stateroots=900 --skip-old-msgs=true /data/download/lotus_chain_tmp.car
-```
-
-自动执行的脚本
-```
-#!/bin/sh
-
-echo `date`>/data/download/export-chain.log
-
-/root/fil-miner/apps/lotus/lotus --repo=/data/cache/.lotus chain export --recent-stateroots=900 --skip-old-msgs=true /data/download/lotus_chain_tmp.car
-
-if [ -f lotus_chain_snapshot.car ]; then
-  mv -v lotus_chain_snapshot.car lotus_chain_snapshot.car.bak
-fi
-if [ -f lotus_chain_tmp.car ]; then
-  mv -v lotus_chain_tmp.car lotus_chain_snapshot.car
-fi
-
-echo `date`>>/data/download/export-chain.log
-echo "export lotus_chain_snapshot.car done"
 ```
 
 自动每天02点执行快照导出
@@ -226,6 +249,8 @@ rm -rf /data/cache/.lotus/datastore.bak
 
 ## 主备切换
 
+**注意，主备切换时不能有密封任务进行中，否则数据可能不一致导致需要进行灾难重建**
+
 ### 日常主备切换
 日常主备切换作用在于裁剪链、主备可用性验证操作，可定时执行。
 
@@ -234,13 +259,13 @@ rm -rf /data/cache/.lotus/datastore.bak
 切换前准备工作  
 ```
 1. 确认链是正常的, 且miner使用的私钥都存在
-2. 确认/data/sdb/lotus-user-1/.lotusminer/config.toml的API配置文件是本机的
-3. 如果扇区在密封中，需停止密封后，从主节点上同步.lotusminer过来改, 否则需要因扇区数据不致需要走损坏恢复流程
+2. 需要从主节点同步/data/sdb/lotus-user-1/.lotusminer数据到备机上，如果长期没有密封任务了同步一次就够了。
+3. 确认/data/sdb/lotus-user-1/.lotusminer/config.toml的API配置文件是本机的
 ```
 
 开两个窗口，一个打开主节点，一个打开备节点  
 ```
-# 一，在主节点上确认wdpost空窗期
+# 一，在shell 1上打开主节点连接，在主节点上确认wdpost空窗期
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
 cd script/lotus/lotus-user
@@ -250,34 +275,40 @@ cd script/lotus/lotus-user
 ./tailf-miner.sh # 跟踪日志，在wdpost结果成功提交时(submitting .... success)
 filc stop lotus-user-1 # 注意!!!!一定在wdpost结果提交成功后再执行
 
-
-# 二，以下在备节点上操作变主节点
+# 二，在shell 2上打开备节点，以下在备节点上操作变主节点
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
 cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh
 
-# 主节点stop命令调用后，立即启动备用节点的lotus-user-1, 一定要事先检查/data/sdb/lotus-user-1/.loutsminer/config.toml文件的正确性
+# 主节点filc stop lotus-user-1命令调用后，
+# 尽快启动备用节点的lotus-user-1,
+# 一定要事先检查/data/sdb/lotus-user-1/.loutsminer/config.toml文件的正确性
 
+filc stop lotus-worker-wdpost
 filc start lotus-user-1
+filc start lotus-worker-wnpost
 ./tailf-miner.sh # 确认日志正常
 filc status  
 
-# 三，恢复主备对应的worker
-# 改动/data/sdb/lotus-user-1/.lotusminer/config.toml指向本机,以备下次应急启动备节点，
-# 确认worker_api指向主节点ip
-
-# 在主节点恢复启动wnpost
-filc status
-filc start lotus-worker-wnpost
-filc stop lotus-worker-wdpost # 恢复到主节点节部署
-filc status
-
-# 在备节点上恢复启动wdpost
-filc status
+# 三，在shell 1上，变更主节点为备节点
+# 修改/data/sdb/lotus-user-1/.lotusminer/worker_api指向到新的主节点
 filc start lotus-worker-wdpost
-filc stop lotus-worker-wnpost
+
+# 此时如一切正常，完成了主备切换
+#
+# 主节点filc status
+# lotus-daemon-1 运行中, 停止为异常
+# lotus-user-1 停止中，停止为异常
+# lotus-worker-wnpost 运行中，可临时停卡，尽可能保持运行
+# lotus-worker-wdpost 停止中，用备机的lotus-worker-wdpost代替计算，以便不与lotus-worker-wnpost同时冲突计算
+#
+# 备节点filc status
+# lotus-daemon-1 运行中, 备用，可稍后进行关停裁剪
+# lotus-user-1 停止中，备用
+# lotus-worker-wnpost 停止中，备用
+# lotus-worker-wdpost 运行中，应尽可能保持运行中，若停止，主节点上的wnpost与wdpost可能会计算冲突。
 ```
 
 ### 灾难切换
@@ -330,9 +361,9 @@ filc restart xxx # 选择适当的重启时间窗口重启需要升级的程序
 
 ### 重建miner
 
-当损坏已发生，不可恢复原.lotusminer数据时，按以下文档重建.lotusminer。
+当损坏已发生，不可恢复原.lotusminer数据时，按以下文档重建主节点.lotusminer数据。
 
-重建前主节点机器准备好软硬件环境，以及相关链
+重建前按主节点机器准备好软硬件环境, lotus-daemon-1必须已正常运行
 ```
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
@@ -343,12 +374,18 @@ cd script/lotus/lotus-user
 filc status # 确定lotus-user-1未运行
 mv /data/sdb/lotus-user-1/.lotusminer /data/sdb/lotus-user-1/.lotusminer.bak
 
-./miner.sh init --actor f0xxx --seal-service
-# 关闭/data/sdb/lotus-user-1/.lotusminer/config.toml中的
-[Subsystems]
-  EnableMarkets = false
-  EnableWnPoSt = false
-  EnableWdPoSt = false
+./miner.sh init --actor f0xxx(已有miner编号) --seal-service
+# # 修改/data/sdb/lotus-user-1/.lotusminer/config.toml配置文件
+# [Subsystems]
+#   EnableMarkets = false
+#   EnableWnPoSt = false
+#   EnableWdPoSt = false
+# [MinerEnv]
+#   # env var: LOTUS_MINERENV_SN
+#   #SN = ""
+#   # env var: LOTUS_MINERENV_SECTORHEAD
+#   SectorHead = "s-f" # 确认是s-t还是s-f打头
+
 
 # 运行一个空服务的lotus-user-1
 filc start lotus-user-1
@@ -360,16 +397,16 @@ filc start lotus-worker-wnpost
 ./miner.sh fstar-storage status # 确认存储正常
 ./miner.sh fstar-storage relink all # 从存储中重建扇区数据
 
-# 开启/data/sdb/lotus-user-1/.lotusminer/config.toml中的
-[Subsystems]
-  EnableMarkets = true
-  EnableWnPoSt = true
-  EnableWdPoSt = true
+# # 修改/data/sdb/lotus-user-1/.lotusminer/config.toml配置文件为正常服务文件
+# [Subsystems]
+#   EnableMarkets = true
+#   EnableWnPoSt = true
+#   EnableWdPoSt = true
 
 filc restart lotus-user-1
 ./tailf-miner.sh # 确认启动日志正常
 
-# 如果仍需要密封，此时需要重新设定扇区编号
+# 如果仍需要密封任务，此时需要重新设定下一个扇区的编号值
 ./miner.sh fstar-sector set-start-id --help
 
 # 完成恢复主节点运行后，按前面的构建恢复备节点运行
