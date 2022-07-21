@@ -251,7 +251,7 @@ rm -rf /data/cache/.lotus/datastore.bak
 
 **注意，主备切换时不能有密封任务进行中，否则数据可能不一致导致需要进行灾难重建**
 
-### 日常主备切换
+### 日常切换
 日常主备切换作用在于裁剪链、主备可用性验证操作，可定时执行。
 
 主备切换需将主节点与备节点的部署进程互换即可，正常主备切换应在wdpost空窗期进行
@@ -259,12 +259,57 @@ rm -rf /data/cache/.lotus/datastore.bak
 切换前准备工作  
 ```
 1. 确认链是正常的, 且miner使用的私钥都存在
-2. 需要从主节点同步/data/sdb/lotus-user-1/.lotusminer数据到备机上，如果长期没有密封任务了同步一次就够了。
-3. 确认/data/sdb/lotus-user-1/.lotusminer/config.toml的API配置文件是本机的
 ```
 
+预启动备节点的miner信息，检查看是否能正常启动
+```
+# 主节点
+cd /data/sdb/lotus-user-1/
+tar -czf lotusminer-f0xxx.tar.gz .lotusminer
+
+# 备节点
+# 复制lotusminer-f0xxx.tar.gz到复节点，如果长期无密封，数据不会变
+cd /data/sdb/lotus-user-1/
+tar -xzf lotusminer-f0xxx.tar.gz # 得到.lotusminer数据
+cd ~/fil-miner
+. env.sh
+cd script/lotus/lotus-user
+. env/lotus-1.sh
+. env/miner-1.sh
+# 修改miner的配置文件为无wdpost与无wnpost服务，并修改好启动的监听服务器
+vim /data/sdb/lotus-user-1/.lotusminer/config.toml
+# 全文替换: %s/原ip/本地局域网ip/g
+# 修改配置文件中的子系统不起启以下这些服务
+# [Subsystems]
+#   EnableMarkets = false
+#   EnableWnPoSt = false
+#   EnableWdPoSt = false
+# 退出vim :wq
+
+filc start lotus-user-1
+./tailf-miner.sh # 确认是否正常启动
+./miner.sh info # 确认可以启动
+./miner.sh fstar-storage status # 确认存储挂载正常
+df -h # 确认存储挂载正常
+filc stop lotus-user-1
+filc status # 确认lotus-user-1停止
+
+# 修改miner的配置文件回来
+vim /data/sdb/lotus-user-1/.lotusminer/config.toml
+# 修改配置文件中的子系统不起启以下这些服务
+# [Subsystems]
+#   EnableMarkets = true 
+#   EnableWnPoSt = true
+#   EnableWdPoSt = true
+# 退出vim :wq
+
+# 准备结束
+```
+
+开始切换  
 开两个窗口，一个打开主节点，一个打开备节点  
 ```
+
 # 一，在shell 1上打开主节点连接，在主节点上确认wdpost空窗期
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
@@ -282,10 +327,8 @@ cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh
 
-# 主节点filc stop lotus-user-1命令调用后，
+# 等待主节点filc stop lotus-user-1命令调用后，
 # 尽快启动备用节点的lotus-user-1,
-# 一定要事先检查/data/sdb/lotus-user-1/.loutsminer/config.toml文件的正确性
-
 filc stop lotus-worker-wdpost
 filc start lotus-user-1
 filc start lotus-worker-wnpost
