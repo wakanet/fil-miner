@@ -325,7 +325,10 @@ cd script/lotus/lotus-user
 . env/lotus-1.sh
 . env/miner-1.sh
 ./miner.sh proving info # 查阅当前的wdpost deadline进度
-./tailf-miner.sh # 跟踪日志，在wdpost结果成功提交时(submitting .... success)
+
+# 不熟时多观察几轮wdpost找节奏感觉
+./tailf-miner.sh|grep "wdpost" # 跟踪wdpost日志，在wdpost结果成功提交时(submitting .... success)
+
 filc stop lotus-user-1 # 注意!!!!一定在wdpost结果提交成功后再执行
 
 # 二，在shell 2上打开备节点，以下在备节点上操作变主节点
