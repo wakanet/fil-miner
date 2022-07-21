@@ -48,7 +48,9 @@ ln -s /data/zfs /data/sdb
 mkdir -p /data/cache/filecoin-proof-parameters/v28 
 
 
-# 下载演示包(演示包中含一个lotus-daemon-1,lotus-user-1,lotus-storage-0,lotus-worker-wnpost,lotus-worker-wdpost,lotus-worker-1进程)
+# 下载演示包
+# 演示包中含一个lotus-daemon-1,lotus-user-1,lotus-storage-0,lotus-worker-wnpost,lotus-worker-wdpost,lotus-worker-1进程
+# 在https://github.com/wakanet/fil-miner/release/找到下载包
 cd ~
 wget -c https://github.com/wakanet/fil-miner/release/xxx-debug.tar.gz . 
 tar -xzf xxx-debug.tar.gz
@@ -97,6 +99,17 @@ fil-miner -- 软件根目录
 
 ## fil-miner进程关系图
 ```
+
+各进程关系图
+                lotus-daemon-1
+                      |
+                lotus-user-1
+      /               |                 \
+lotus-storage-0  lotus-worker-1  lotus-worker-wdpost(wnpost)
+
+
+进程说明
+-------------------
 lotus-daemon-1 关联目录与文件
 /data/cache/.lotus
 
@@ -114,14 +127,6 @@ lotus-worker-wnpost 关联目录与文件
 
 lotus-worker-wdpost 关联目录与文件
 /data/sdb/lotus-user-1/.lotusminer/worker_api, /data/sdb/lotus-user-1/.lotusminer/worker_token, /data/cache/.lotusworker
-
-
-各进程关系图
-                lotus-daemon-1
-                      |
-                lotus-user-1
-      /               |                 \
-lotus-storage-0  lotus-worker-1  lotus-worker-wdpost(wnpost)
 ```
 
 ## 启动链 
