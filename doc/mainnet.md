@@ -7,7 +7,6 @@
 - [软件安装](#软件安装)
 - [运行主节点](#运行主节点)
 - [运行备节点](#运行备节点)
-- [运行工人节点](#运行工人节点)
 - [生成链快照](#生成链快照)
 - [主备切换](#主备切换)
   - [日常切换](##日常切换)
@@ -16,6 +15,7 @@
 - [升级节点](#升级节点)
 - [灾难恢复](#灾难恢复)
   - [重建miner](#重建miner)
+- [运行密封工人](#运行密封工人)
 
 ## 硬件要求
 **此为32GB, 64GB扇区要求，模拟环境2KB扇区同debug.md的硬件要求**
@@ -466,3 +466,111 @@ filc restart lotus-user-1
 # 完成恢复主节点运行后，按前面的构建恢复备节点运行
 ```
 
+## 运行密封工人
+### Precommit密封工人
+#### 硬件要求
+**此为32GB, 64GB扇区要求，模拟环境2KB扇区同debug.md的硬件要求**
+```
+CPU: AMD或Intel支持sha256运算的CPU, 这里为双座双核AMD7543 
+内存: 官方要求64GB以上，这里为2TB内存;   
+显卡: NVIDIA RTX 2080 TI, NVIDIA RTX 3080, NVIDIA RTX 3090都可以，这里为双卡RTX 3090  
+SSD: 至少1T空间, 这里为4块8T SSD盘
+```
+
+#### 软件依赖
+```
+系统版本：20.04
+
+sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
+
+显卡驱动安装参考前面的CUDA安装
+```
+
+#### 下载主网的fil-miner
+**2KB模拟环境不需要再下载此包，需要注意产生与模拟环境一个是mainnet版本，一个是debug版本。**
+```
+# 下载release版的fil-miner-linux-amd64-mainnet-xxx.tar.gz
+# 在https://github.com/wakanet/fil-miner/release/找到下载包
+tar -xzf fil-miner-linux-amd64-mainnet-xxx.tar.gz
+cd ~/fil-miner
+. env.sh # 加载全局环境变量
+./install.sh install
+```
+
+#### 运行28任务程序
+```
+mkdir -p /data/sdb/lotus-user-1/.lotusminer
+cd /data/sdb/lotus-user-1/.lotusminer
+# 从miner复制.lotusminer/worker_api与worker_token过来
+
+cd ~/fil-miner
+. env.sh
+rm ./etc/supd/apps/*.ini
+cp ./etc/supd/apps/tpl/lotus-worker-t28.ini ./etc/supd/apps/
+filc reload
+filc start lotus-worker-t28
+
+# 在miner端校验
+cd ~/fil-miner
+. env.sh
+cd script/lotus/lotus-user
+. env/lotus-1.sh
+. env/miner-1.sh
+./miner.sh fstar-worker list
+```
+
+
+### Commit密封工人
+#### 硬件要求
+**此为32GB, 64GB扇区要求，模拟环境2KB扇区同debug.md的硬件要求**
+```
+CPU: AMD或Intel的CPU, 这里为未指定
+内存: 官方要求64GB以上，这里为256GB内存;   
+显卡: NVIDIA RTX 2080 TI, NVIDIA RTX 3080, NVIDIA RTX 3090都可以，这里为四卡RTX 3080  
+存储: 无要求
+```
+
+#### 软件依赖
+```
+系统版本：20.04
+
+sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
+
+显卡驱动安装参考前面的CUDA安装
+```
+
+#### 下载主网的fil-miner
+**2KB模拟环境不需要再下载此包，需要注意产生与模拟环境一个是mainnet版本，一个是debug版本。**
+```
+# 下载release版的fil-miner-linux-amd64-mainnet-xxx.tar.gz
+# 在https://github.com/wakanet/fil-miner/release/找到下载包
+tar -xzf fil-miner-linux-amd64-mainnet-xxx.tar.gz
+cd ~/fil-miner
+. env.sh # 加载全局环境变量
+./install.sh install
+```
+
+#### 运行4任务C2程序
+```
+mkdir -p /data/sdb/lotus-user-1/.lotusminer
+cd /data/sdb/lotus-user-1/.lotusminer
+# 从miner复制.lotusminer/worker_api与worker_token过来
+
+cd ~/fil-miner
+. env.sh
+rm ./etc/supd/apps/*.ini
+cp ./etc/supd/apps/tpl/lotus-worker-c2-0.ini ./etc/supd/apps/
+cp ./etc/supd/apps/tpl/lotus-worker-c2-1.ini ./etc/supd/apps/
+cp ./etc/supd/apps/tpl/lotus-worker-c2-2.ini ./etc/supd/apps/
+cp ./etc/supd/apps/tpl/lotus-worker-c2-3.ini ./etc/supd/apps/
+filc reload
+filc start all
+
+# 在miner端校验
+cd ~/fil-miner
+. env.sh
+cd script/lotus/lotus-user
+. env/lotus-1.sh
+. env/miner-1.sh
+./miner.sh fstar-worker list
+```
