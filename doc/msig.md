@@ -28,14 +28,14 @@ lotus-miner actor set-owner --really-do-it 新多签帐户(f01004) 原钱包 # �
 
 # 提议通过新的请求
 # lotus-shed miner-multisig propose-change-owner [command options] [newOwner]
-lotus-shed miner-multisig --from 多签帐户的第一个签名地址 --miner=<minerid> --mutisig=<多签帐户f01004> propose-change-owner f01004
+lotus-shed miner-multisig --from 多签帐户的第一个签名地址 --miner=<minerid> --multisig=<多签帐户f01004> propose-change-owner f01004
 
 # 查询提议的信息
 lotus msig inspect f01004
 
 # 通过提议
 # lotus-shed miner-multisig approve-change-owner [command options] [newOwner txnId proposer]
-lotus-shed miner-multisig --from 多签帐户的第二个签名地址 --miner=<minerid> --mutisig=<多签帐户f01004> approve-change-owner f01004 0 多签帐户的第一个提议地址
+lotus-shed miner-multisig --from 多签帐户的第二个签名地址 --miner=<minerid> --multisig=<多签帐户f01004> approve-change-owner f01004 0 多签帐户的第一个提议地址
 
 # 提现以及其他miner的owner操作见lotus-shed miner-multisig --help
 ```
