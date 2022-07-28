@@ -46,6 +46,11 @@ sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc b
 
 ### 显卡驱动安装
 **2k环境不需要安装此显卡要求**
+
+#### 在线安装
+sudo aptitude install nvidia-driver-510-server
+
+#### 本地安装
 因此当前版本要求使用CUDA进行算法运算，需要安装测试过的显卡驱动包.  
 显卡驱动Nouveau安装失败的问题  
 https://ld246.com/article/1378012262086
@@ -60,7 +65,7 @@ cp /etc/modprobe.d/nvidia-installer-disable-nouveau.conf ~/nvidia-installer-disa
 echo "blacklist nouveau">/etc/modprobe.d/nvidia-installer-disable-nouveau.conf
 echo "options nouveau modeset=0">/etc/modprobe.d/nvidia-installer-disable-nouveau.conf
 update-initramfs -u
-update-grub
+#update-grub
 
 ./cuda_11.6.2_510.47.03_linux.run # 建议本nvidia官方包中的显卡驱动以便cuda尽可以兼容
 # 或静默安装 ./cuda_11.6.2_510.47.03_linux.run --silent --driver --toolkit

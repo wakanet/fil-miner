@@ -138,8 +138,10 @@ cp etc/supd/apps/tpl/lotus-daemon-1.ini etc/supd/apps # 准备lotus链进程
 filc reload
 filc status
 
-filc start lotus-daemon-1
 cd script/lotus/lotus-user
+./lotus.sh fetch-params 2KiB # 首次使用时需手工检查参数包, 其他为512MiB, 32GiB, 64GiB
+
+filc start lotus-daemon-1
 . env/lotus-1.sh # 切换lotus.sh的环境变量指向到lotus-daemon-1
 ./lotus.sh sync status # 查看链状态
 # 查看lotus-daemon-1的日志，更多需要时查~/fil-miner/var/log
@@ -161,6 +163,9 @@ cd script/lotus/lotus-user
 ./lotus.sh wallet new bls # 创建一个t3钱包地址
 ./lotus.sh wallet list # 将钱包地址发管理员要测试币
 ./lotus.sh wallet list # 确认水龙头的钱到帐号，可以创建miner
+
+./lotus.sh fetch-params 2KiB # 首次使用时需手工检查参数包, 其他为512MiB, 32GiB, 64GiB
+
 ./miner.sh init --owner=t3xxx(上面创建的钱包地址) --sector-size=2KiB
 
 # 以上init成功后可以开始运行miner, init只需在首次创建时使用
