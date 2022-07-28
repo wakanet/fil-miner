@@ -65,7 +65,6 @@ worker_repo=$2
 if [ -z "$worker_repo" ]; then
     worker_repo=/data/cache/.lotusworker 
 fi
-fi
 storage_repo=$3
 if [ -z "$storage_repo" ]; then
     storage_repo="/data/lotus-push" # 密封结果存放
