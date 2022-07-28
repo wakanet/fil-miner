@@ -8,7 +8,7 @@ export FIL_PROOFS_MAXIMIZE_CACHING=1  # open cache for 32GB or 64GB
 export FIL_PROOFS_USE_MULTICORE_SDR=1
 export FIL_PROOFS_PARENT_CACHE="/data/cache/filecoin-parents"
 export FIL_PROOFS_PARAMETER_CACHE="/data/cache/filecoin-proof-parameters/v28" 
-export worker_id_file="~/.lotusworker/worker-c2-2.id"
+export worker_id_file="~/.lotusworker/worker-c2-3.id"
 
 if [ -z "FIL_PROOFS_GPU_MODE" ]; then
     export FIL_PROOFS_GPU_MODE="force"
@@ -16,7 +16,7 @@ fi
 
 # Special configuration for lianpai
 # Select one GPU for using
-export NEPTUNE_DEFAULT_GPU_IDX=2
+export NEPTUNE_DEFAULT_GPU_IDX=3
 
 mkdir -p $FIL_PROOFS_PARENT_CACHE
 mkdir -p $FIL_PROOFS_PARAMETER_CACHE 
@@ -79,7 +79,7 @@ netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one
 if [ -z $netip ]; then
     netip="127.0.0.1"
 fi
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --listen-addr="$netip:1302" --parallel-pledge=0 --parallel-precommit1=0 --parallel-precommit2=0 --parallel-commit=0 --commit2-srv=true &
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --listen-addr="$netip:1303" --parallel-pledge=0 --parallel-precommit1=0 --parallel-precommit2=0 --parallel-commit=0 --commit2-srv=true &
 pid=$!
 
 # set ulimit for process

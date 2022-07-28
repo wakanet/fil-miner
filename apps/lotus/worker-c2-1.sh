@@ -15,8 +15,8 @@ if [ -z "FIL_PROOFS_GPU_MODE" ]; then
 fi
 
 # Special configuration for lianpai
-export C2_FFT_PARA_NUM=4
-export C2_GPU_GROUP=0
+# Select one GPU for using
+export NEPTUNE_DEFAULT_GPU_IDX=1
 
 mkdir -p $FIL_PROOFS_PARENT_CACHE
 mkdir -p $FIL_PROOFS_PARAMETER_CACHE 
@@ -61,23 +61,17 @@ if [ -z "$miner_repo" ]; then
     miner_repo=/data/sdb/lotus-user-1/.lotusminer
 fi
 
-# new version
-#worker_repo=$2
-#if [ -z "$worker_repo" ]; then
-#    worker_repo=/data/cache/.lotusworker 
-#fi
-# for lianpai
-repo=$2
-if [ -z "$repo" ]; then
-    repo=/data/cache/.lotusworker 
+worker_repo=$2
+if [ -z "$worker_repo" ]; then
+    worker_repo=/data/cache/.lotusworker 
+fi
 fi
 storage_repo=$3
 if [ -z "$storage_repo" ]; then
     storage_repo="/data/lotus-push" # 密封结果存放
 fi
 
-#mkdir -p $worker_repo
-mkdir -p $repo
+mkdir -p $worker_repo
 mkdir -p $miner_repo
 mkdir -p $storage_repo
 
@@ -85,8 +79,7 @@ netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one
 if [ -z $netip ]; then
     netip="127.0.0.1"
 fi
-#RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --listen-addr="$netip:1284" --parallel-addpiece=0 --parallel-precommit1=0 --parallel-precommit2=0 --parallel-commit1=0 --parallel-commit2=0 --commit2-srv=true &
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip ./lotus-worker --repo=$repo --miner-repo=$miner_repo --storage-repo=$storage_repo --id-file="$worker_id_file" --listen-addr="$netip:1284" --parallel-addpiece=0 --parallel-precommit1=0 --parallel-precommit2=0 --parallel-commit1=0 --parallel-commit2=0 --commit2-srv=true run &
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --listen-addr="$netip:1301" --parallel-pledge=0 --parallel-precommit1=0 --parallel-precommit2=0 --parallel-commit=0 --commit2-srv=true &
 pid=$!
 
 # set ulimit for process

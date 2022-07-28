@@ -47,7 +47,6 @@ if [ ! -z "$gpu" ]; then
         ;;
         #TODO: more match
     esac
-
 fi
 
 
