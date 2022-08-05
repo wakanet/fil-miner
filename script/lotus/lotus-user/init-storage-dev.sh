@@ -22,20 +22,22 @@ netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one
 if [ -z $netip ]; then
     netip=127.0.0.1
 fi
-
-## add sealed storage
-# 1PB capacity
-#./miner.sh fstar-storage add --kind=0 --mount-type="custom" --mount-dir="/data/nfs" --mount-signal-uri="-" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100000
-#./miner.sh fstar-storage add --kind=0 --mount-type="nfs" --mount-opt="-o vers=3,rw,nolock,intr,proto=tcp,rsize=1048576,wsize=1048576,hard,timeo=7,retrans=10,actimeo=10,retry=5" --mount-signal-uri="$netip:/data/zfs" --mount-transf-uri="$netip:/data/zfs" --mount-dir="/data/nfs" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100
-./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs" --mount-transf-uri="$netip:1331" --mount-dir="/data/nfs" --mount-auth-uri="$netip:1330" --max-size=-1 --sector-size=35433480192 --max-work=100
+#netip=10.68.1.18
 
 ## add unsealed storage
 #./miner.sh fstar-storage add --kind=1 --mount-type="custom" --mount-dir="/data/nfs" --mount-signal-uri="-" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100000
 #./miner.sh fstar-storage add --kind=1 --mount-type="nfs" --mount-opt="-o vers=3,rw,nolock,intr,proto=tcp,rsize=1048576,wsize=1048576,hard,timeo=7,retrans=10,actimeo=10,retry=5" --mount-signal-uri="$netip:/data/zfs" --mount-transf-uri="$netip:/data/zfs" --mount-dir="/data/nfs" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100
 ./miner.sh fstar-storage add --kind=1 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs" --mount-transf-uri="$netip:1331" --mount-dir="/data/nfs" --mount-auth-uri="$netip:1330" --max-size=-1 --sector-size=35433480192 --max-work=100
 
-## more seal storage example
+## add sealed storage
+# 1PB capacity
+#./miner.sh fstar-storage add --kind=0 --mount-type="custom" --mount-dir="/data/nfs" --mount-signal-uri="-" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100000
+#./miner.sh fstar-storage add --kind=0 --mount-type="nfs" --mount-opt="-o vers=3,rw,nolock,intr,proto=tcp,rsize=1048576,wsize=1048576,hard,timeo=7,retrans=10,actimeo=10,retry=5" --mount-signal-uri="$netip:/data/zfs" --mount-transf-uri="$netip:/data/zfs" --mount-dir="/data/nfs" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100
+## lotus-storage-0
+./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs" --mount-transf-uri="$netip:1331" --mount-dir="/data/nfs" --mount-auth-uri="$netip:1330" --max-size=-1 --sector-size=35433480192 --max-work=100
+## lotus-storage-1 
 #./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs1" --mount-transf-uri="$netip:1341" --mount-dir="/data/nfs" --mount-auth-uri="$netip:1340" --max-size=354334801920 --sector-size=35433480192 --max-work=100 # for lotus-storage-1
+## lotus-storage-2
 #./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs2" --mount-transf-uri="$netip:1351" --mount-dir="/data/nfs" --mount-auth-uri="$netip:1350" --max-size=354334801920 --sector-size=35433480192 --max-work=100 # fro lotus-storage-2
 
 # ./miner.sh fstar-storage scale --storage-id=1 --max-size=1125899906842624
