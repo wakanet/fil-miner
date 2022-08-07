@@ -46,11 +46,7 @@ fi
 
 repodir=$1
 if [ ! -d "$repodir" ]; then
-    if [ -d /data/sdb/lotus-user-1/.lotus-proxy ]; then
-        repodir=/data/sdb/lotus-user-1/.lotus-proxy
-    else
-        repodir=/data/cache/.lotus
-    fi
+   repodir=/data/cache/.lotus
 fi
 minerdir=$2
 if [ ! -d "$minerdir" ]; then

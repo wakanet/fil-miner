@@ -114,7 +114,9 @@ lotus-daemon-1 关联目录与文件
 /data/cache/.lotus
 
 lotus-user-1 关联目录与文件
-/data/cache/.lotus/api, /data/cache/.lotus/token, /data/sdb/lotus-user-1/.lotusminer
+/data/sdb/lotus-user-1/.lotusminer
+/data/sdb/lotus-user-1/.lotus-proxy/api, /data/sdb/lotus-user-1/.lotus-proxy/token # 若存在，优先使用
+/data/cache/.lotus/api, /data/cache/.lotus/token # 若.lotus-proxy不存在，则启动此目录
 
 lotus-storage-0 关联目录与文件
 /data/zfs,fil-miner/var/lotus-storage-0
@@ -142,7 +144,7 @@ cd script/lotus/lotus-user
 ./lotus.sh fetch-params 2KiB # 首次使用时需手工检查参数包, 其他为512MiB, 32GiB, 64GiB
 
 filc start lotus-daemon-1
-. env/lotus-1.sh # 切换lotus.sh的环境变量指向到lotus-daemon-1
+. env/miner-1.sh # 切换lotus.sh的环境变量指向到lotus-daemon-1
 ./lotus.sh sync status # 查看链状态
 # 查看lotus-daemon-1的日志，更多需要时查~/fil-miner/var/log
 ./tailf-lotus.sh 
@@ -158,7 +160,6 @@ filc reload
 filc status
 
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 ./lotus.sh wallet new bls # 创建一个t3钱包地址
 ./lotus.sh wallet list # 将钱包地址发管理员要测试币
@@ -186,7 +187,6 @@ filc reload
 filc status
 
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 filc status # 确认进程中有lotus-storage-0
 filc start lotus-storage-0 # 会自动配置nfs文件，nfs文件将会是只读；写操作需要通过http来操作。
@@ -213,7 +213,6 @@ filc reload
 filc status
 
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 filc status # 确认进程中有lotus-worker-1
 
@@ -237,7 +236,6 @@ filc reload
 filc status
 
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 filc status # 确认进程中有lotus-worker-wdpost
 
@@ -255,7 +253,6 @@ filc reload
 filc status
 
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 filc status # 确认进程中有lotus-worker-wnpost
 

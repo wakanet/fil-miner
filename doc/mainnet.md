@@ -9,9 +9,9 @@
 - [运行备节点](#运行备节点)
 - [生成链快照](#生成链快照)
 - [主备切换](#主备切换)
-  - [日常切换](##日常切换)
-  - [灾难切换](##灾难切换)
-  - [存储替换](##存储替换)
+  - [主备链切换](##主备链切换)
+  - [主备机切换](##主备机切换)
+  - [存储机替换](##存储机替换)
 - [升级节点](#升级节点)
 - [灾难恢复](#灾难恢复)
   - [重建miner](#重建miner)
@@ -116,7 +116,6 @@ filc reload
 filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wnpost, lotus-worker-wdpost
 
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 filc start lotus-daemon-1
 ./tailf-lotus.sh # 确认日志正常
@@ -171,7 +170,6 @@ filc reload
 filc status # 确认有lotus-daemon-1, lotus-user-1, lotus-worker-wnpost, lotus-worker-wdpost
 
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 filc start lotus-daemon-1
 ./tailf-lotus.sh # 确认日志正常
@@ -240,7 +238,7 @@ filc status # 确认链程序停止(ps aux|grep "lotus"也可以确认)
 
 # 导入快照
 cd script/lotus/lotus-user
-. env/lotus-1.sh
+. env/miner-1.sh
 cat export-chain.sh
 mv /data/cache/.lotus/datastore /data/cache/.lotus/datastore.bak # 备份原链数据
 ./lotus.sh daemon --import-snapshot ./lotus_chain_snapshot.car --halt-after-import # 导入快照
@@ -256,38 +254,77 @@ rm -rf /data/cache/.lotus/datastore.bak
 
 **注意，主备切换时不能有密封任务进行中，否则数据可能不一致导致需要进行灾难重建**
 
-### 日常切换
-日常主备切换作用在于裁剪链、主备可用性验证操作，可定时执行。
+### 日常链切换
+日常主备基于主备机器都正常的情况下进行日常的主备链指向切换,
+用在于裁剪链、主备可用性验证操作等定时执行的工作。
 
-主备切换需将主节点与备节点的部署进程互换即可，正常主备切换应在wdpost空窗期进行
+主备链切换只需将主节点与备节点的部署进程互换即可，切换应在wdpost空窗期进行
 
-切换前备节准备工作
-1. 确认链是正常的, 且miner使用的私钥都存在
+切换前备节点准备工作
+**开两个窗口，一个打开主节点，一个打开备节点** 
+
+确定主节点与备节点信息
 ```
+# 确认miner使用的主节点链与备链节点位置
+cd ~/fil-miner
+filc status # 若lotus-user-1处于启动状态，则为主节点
+cat /data/sdb/lotus-user-1/.lotus-proxy/api # 若有，则miner指向该链，否则cat /data/cache/.lotus/api
+mkdir -p /data/sdb/lotus-user-1/.lotus-proxy/keystore
+vim /data/sdb/lotus-user-1/.lotus-proxy/api # 将需要指向链的地址写入，可在/data/cache/.lotus/api得到该数据
+vim /data/sdb/lotus-user-1/.lotus-proxy/token # 将需要指链的token写入，可在/data/cache/.lotus/token得到该数据
+chmod 0600 /data/sdb/lotus-user-1/.lotus-proxy/token
+cd ~/fil-miner/script/lotus/lotus-user
+. env/miner-1.sh
+./lotus.sh sync status # 确认指向的链可正常使用
+./lotus.sh wallet list # 确认指向的链的对应miner钱包密钥存在
+```
+
+在shell 1上打开主节点连接，观察wdpost空窗期
+```
+cd ~/fil-miner
+. env.sh # 加载全局环境变量
+cd script/lotus/lotus-user
+. env/miner-1.sh
+./miner.sh proving info # 查阅当前的wdpost deadline进度
+
+# 不熟悉时多观察几轮wdpost找节奏感觉
+./tailf-miner.sh|grep "wdpost" # 跟踪wdpost日志，在wdpost结果成功提交时(submitting .... success)
+
+filc restart lotus-user-1 # 注意!!!!一定在wdpost结果提交成功后再执行
+
+### 主备机切换
+
+主备机切换用于在主备机都正常的情况下，需要关闭一台机器时使用
+
+**开两个窗口，一个打开主节点，一个打开备节点**
+
+准备备机环境
+```
+# 1. 确认链是正常的, 且miner使用的私钥都存在
 cd ~/fil-miner
 . env.sh
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
-
 ./lotus.sh sync status # 确认链同步正常
 ./lotus.sh wallet list # 确认miner对应的钱包密钥存在
-```
 
-2. 预启动备节点的miner信息，检查看是否能正常启动
-```
-# 主节点
-cd /data/sdb/lotus-user-1/
-tar -czf lotusminer-f0xxx.tar.gz .lotusminer
+# 2. 预启动备节点的miner信息，检查看是否能正常启动
+# 备复主节点上的/data/sdb/lotus-user-1/.lotus-miner到同样的位置
 
-# 备节点
-# 复制lotusminer-f0xxx.tar.gz到复节点，如果长期无密封，数据不会变
-cd /data/sdb/lotus-user-1/
-tar -xzf lotusminer-f0xxx.tar.gz # 得到.lotusminer数据
+# 3. 可选创建.lotus-proxy
+mkdir -p /data/sdb/lotus-user-1/.lotus-proxy/keystore
+vim /data/sdb/lotus-user-1/.lotus-proxy/api # 将需要指向链的地址写入，可在/data/cache/.lotus/api得到该数据
+vim /data/sdb/lotus-user-1/.lotus-proxy/token # 将需要指链的token写入，可在/data/cache/.lotus/token得到该数据
+chmod 0600 /data/sdb/lotus-user-1/.lotus-proxy/token
+cd ~/fil-miner/script/lotus/lotus-user
+. env/miner-1.sh
+./lotus.sh sync status # 确认指向的链可正常使用
+./lotus.sh wallet list # 确认指向的链的对应miner钱包密钥存在
+
+# 4. 预启动miner节点校验是否可正常启动
 cd ~/fil-miner
 . env.sh
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 # 修改miner的配置文件为无wdpost与无wnpost服务，并修改好启动的监听服务器
 vim /data/sdb/lotus-user-1/.lotusminer/config.toml
@@ -298,7 +335,6 @@ vim /data/sdb/lotus-user-1/.lotusminer/config.toml
 #   EnableWnPoSt = false
 #   EnableWdPoSt = false
 # 退出vim :wq
-
 filc start lotus-user-1
 ./tailf-miner.sh # 确认是否正常启动
 ./miner.sh info # 确认可以启动
@@ -306,7 +342,6 @@ filc start lotus-user-1
 df -h # 确认存储挂载正常
 filc stop lotus-user-1
 filc status # 确认lotus-user-1停止
-
 # 修改miner的配置文件回来
 vim /data/sdb/lotus-user-1/.lotusminer/config.toml
 # 修改配置文件中的子系统不起启以下这些服务
@@ -315,14 +350,11 @@ vim /data/sdb/lotus-user-1/.lotusminer/config.toml
 #   EnableWnPoSt = true
 #   EnableWdPoSt = true
 # 退出vim :wq
-
 # 准备结束
 ```
 
-3. 开始切换  
-开两个窗口，一个打开主节点，一个打开备节点  
+切换主备机
 ```
-
 # 一，在shell 1上打开主节点连接，在主节点上确认wdpost空窗期
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
@@ -370,9 +402,6 @@ filc start lotus-worker-wdpost
 # lotus-worker-wdpost 运行中，应尽可能保持运行中，若停止，主节点上的wnpost与wdpost可能会计算冲突。
 ```
 
-### 灾难切换
-
-参考[灾难恢复-重建miner](#参考重建miner)
 
 ### 存储替换
 当存储发布故障时，需要替换存储ip，或者临时退出挂载盘，可通过以下指令来完成,但因存储不同参数会有些变化，产生以实际挂载为准.
@@ -427,7 +456,6 @@ filc restart xxx # 选择适当的重启时间窗口重启需要升级的程序
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 
 filc status # 确定lotus-user-1未运行
@@ -519,7 +547,6 @@ filc start lotus-worker-t28
 cd ~/fil-miner
 . env.sh
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 ./miner.sh fstar-worker list
 ```
@@ -575,7 +602,6 @@ filc start all
 cd ~/fil-miner
 . env.sh
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 ./miner.sh fstar-worker list
 ```

@@ -3,12 +3,7 @@ export IPFS_GATEWAY="https://proof-parameters.s3.cn-south-1.jdcloud-oss.com/ipfs
 export FIL_PROOFS_PARAMETER_CACHE="/data/cache/filecoin-proof-parameters/v28" 
 
 if [ -z "$lotusrepo" ]; then
-    echo "Not found env 'lotusrepo' using default"
-    lotusrepo=/data/cache/.lotus
-fi
-if [ -z "$filrepo" ]; then
-    echo "Not found env 'filrepo' using default"
-    filrepo="/data/sdb/lotus-user-1/.lotusminer"
+   . env/miner-1.sh
 fi
 
 init=0
