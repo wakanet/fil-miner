@@ -210,21 +210,27 @@ filc status
 ## 生成链快照
 因产生的链数据大，应找一台专用链机器，用于日常快照生成  
 
-./export-chain.sh执行快照导出, 或参考./export-chain.sh生成新的脚本注意修改lotus可执行程序的位置指向
 ```
+cd ~/fil-miner
+. env.sh
+cd script/lotus/lotus-user
+. env/lotus-1.sh # 注意repo的路径
+./export-chain.sh执行快照导出, 
+
+#或参考./export-chain.sh生成新的脚本注意修改lotus可执行程序的位置指向
 /root/fil-miner/apps/lotus/lotus --repo=/data/cache/.lotus chain export --recent-stateroots=900 --skip-old-msgs=true /data/download/lotus_chain_tmp.car
 ```
 
 自动每天02点执行快照导出
 ```
 crontab -e
-0 14 * * * sh -x /data/download/export-chain.sh >>/data/download/export-chain.log
+0 14 * * * sh -x /data/download/export-chain.sh >>/data/download/export-chain.log # 注意改export-chain.sh里的为绝对路径
 ```
 
 链快照裁剪
 ```
 # 下载链快照
-wget http://10.202.89.95:8081/download/lotus_chain_snapshot.car
+wget -c http://10.202.89.95:8081/download/lotus_chain_snapshot.car
 
 # 确认当前链没有程序在用，关闭链程序; 
 # 生产部署中若是主节点的链需要裁剪，应进行主备切换变备节点处于空闲后再裁减
@@ -238,7 +244,7 @@ filc status # 确认链程序停止(ps aux|grep "lotus"也可以确认)
 
 # 导入快照
 cd script/lotus/lotus-user
-. env/miner-1.sh
+. env/lotus-1.sh # 注意repo路径
 cat export-chain.sh
 mv /data/cache/.lotus/datastore /data/cache/.lotus/datastore.bak # 备份原链数据
 ./lotus.sh daemon --import-snapshot ./lotus_chain_snapshot.car --halt-after-import # 导入快照
@@ -359,7 +365,6 @@ vim /data/sdb/lotus-user-1/.lotusminer/config.toml
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 ./miner.sh proving info # 查阅当前的wdpost deadline进度
 
@@ -372,7 +377,6 @@ filc stop lotus-user-1 # 注意!!!!一定在wdpost结果提交成功后再执行
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
 cd script/lotus/lotus-user
-. env/lotus-1.sh
 . env/miner-1.sh
 
 # 等待主节点filc stop lotus-user-1命令调用后，
