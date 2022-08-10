@@ -29,19 +29,22 @@ if [ ! -z "$gpu" ]; then
     FIL_PROOFS_USE_GPU_TREE_BUILDER=1
     #"NVIDIA Quadro RTX 6000:4608, NVIDIA TITAN RTX:4608, NVIDIA Tesla V100:5120, NVIDIA Tesla P100:3584, NVIDIA Tesla T4:2560, NVIDIA Quadro M5000:2048, NVIDIA GeForce RTX 3090:10496, NVIDIA GeForce RTX 3080:8704, NVIDIA GeForce RTX 3070:5888, NVIDIA GeForce RTX 2080 Ti:4352, NVIDIA GeForce RTX 2080 SUPER:3072, NVIDIA GeForce RTX 2080:2944, NVIDIA GeForce RTX 2070 SUPER:2560, NVIDIA GeForce GTX 1080 Ti:3584, NVIDIA GeForce GTX 1080:2560, NVIDIA GeForce GTX 2060:1920, NVIDIA GeForce GTX 1660 Ti:1536, NVIDIA GeForce GTX 1060:1280, NVIDIA GeForce GTX 1650 SUPER:1280, NVIDIA GeForce GTX 1650:896"
     case $gpu in
-        *"GeForce RTX 3090"*):
+        *"GeForce RTX 3090"):
             export BELLMAN_CUSTOM_GPU="$gpu:10496"
         ;;
-        *"GeForce RTX 3080"*):
+        *"GeForce RTX 3080"):
             export BELLMAN_CUSTOM_GPU="$gpu:8704"
         ;;
-        *"GeForce RTX 3070"*):
+        *"GeForce RTX 3070"):
             export BELLMAN_CUSTOM_GPU="$gpu:5888"
         ;;
-        *"GeForce RTX 2080 Ti"*):
+        *"GeForce RTX 3060"):
+            export BELLMAN_CUSTOM_GPU="$gpu:3584"
+        ;;
+        *"GeForce RTX 2080 Ti"):
             export BELLMAN_CUSTOM_GPU="$gpu:4352"
         ;;
-        *"GeForce RTX 2080 SUPER"*):
+        *"GeForce RTX 2080 SUPER"):
             export BELLMAN_CUSTOM_GPU="$gpu:3072"
         ;;
         #TODO: more match
@@ -73,8 +76,10 @@ netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one
 if [ -z $netip ]; then
     netip="127.0.0.1"
 fi
+cpus=$(./lotus-worker pledge --cpus)
 RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --max-tasks=24 --parallel-pledge=24 --parallel-precommit1=24 --parallel-precommit2=2 --parallel-commit=0 &
 pid=$!
+taskset -c $cpus -p $pid
 
 # set ulimit for process
 nropen=$(cat /proc/sys/fs/nr_open)
