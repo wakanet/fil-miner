@@ -73,8 +73,11 @@ netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one
 if [ -z $netip ]; then
     netip="127.0.0.1"
 fi
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run &
+cpu_bind=$(./lotus-worker pledge --cpu-bind)
+cpu_num=$(./lotus-worker pledge --cpu-num)
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run &
 pid=$!
+taskset -pc $cpu_bind $pid
 
 # set ulimit for process
 nropen=$(cat /proc/sys/fs/nr_open)

@@ -53,7 +53,7 @@ netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one
 if [ -z $netip ]; then
     netip="127.0.0.1"
 fi
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip ./lotus-worker --worker-repo=$worker_repo rebuild --miner-id=80868
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo rebuild --miner-id=80868
 pid=$!
 
 # set ulimit for process

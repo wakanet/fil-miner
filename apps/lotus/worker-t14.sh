@@ -76,11 +76,12 @@ netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one
 if [ -z $netip ]; then
     netip="127.0.0.1"
 fi
-cpus=$(./lotus-worker pledge --cpus)
+cpu_bind=$(./lotus-worker pledge --cpu-bind)
+cpu_num=$(./lotus-worker pledge --cpu-num)
 # ssd size = 12TB, cores L3 group 32, core thread x2
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --max-tasks=28 --transfer-buffer=2 --parallel-pledge=14 --parallel-precommit1=14 --parallel-precommit2=2 --parallel-commit=0 &
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --max-tasks=28 --transfer-buffer=2 --parallel-pledge=14 --parallel-precommit1=14 --parallel-precommit2=2 --parallel-commit=0 &
 pid=$!
-taskset -c $cpus -p $pid
+taskset -pc $cpu_bind $pid
 
 # set ulimit for process
 nropen=$(cat /proc/sys/fs/nr_open)
