@@ -78,7 +78,6 @@ if [ -z $netip ]; then
 fi
 cpu_bind=$(./lotus-worker pledge --cpu-bind)
 cpu_num=$(./lotus-worker pledge --cpu-num)
-export FILECOIN_P2_GROUP_NUM=18 # 32-14
 # ssd size = 12TB, cores L3 group 32, core thread x2
 RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --max-tasks=28 --transfer-buffer=2 --parallel-pledge=14 --parallel-precommit1=14 --parallel-precommit2=1 --parallel-commit=0 &
 pid=$!
