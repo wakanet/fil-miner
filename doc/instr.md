@@ -61,7 +61,7 @@
     -- Sealer 密封器
        lotus-miner默认内置有一个工人密封器
        -- AddPiece 将数据添加到一个存储扇区
-       -- Packing 将AddPiece打包为一个完整的扇区，不足补空.
+       -- Packing 将AddPiece打包完整的unsealed扇区，不足补空.
        -- Precommit1 预复制证明阶段1
        -- Precommit2 预复制证明阶段2
        -- Commit1 上链后的证明阶段校验1
