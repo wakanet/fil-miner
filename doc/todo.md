@@ -14,6 +14,7 @@
 - [基础测试]
 - [wdpost统计]
 - [wnpost性能]
+- [集群部署]
 
 
 TODO: more

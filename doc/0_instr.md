@@ -6,7 +6,7 @@
                       |
                 lotus-miner
       /               |                 \
-  storage       lotus-worker  lotus-worker(wdpost,wnpost)
+  storage  lotus-worker(sealing)  lotus-worker(wdpost,wnpost)
 ```
 
 ## 术语说明

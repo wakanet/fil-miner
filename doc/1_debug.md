@@ -1,4 +1,6 @@
-# 单机验证节点(2k环境)
+# 单机验证节点
+
+单机节点主要用于演示与示例，掌握后结合mainnet.md进行生产部署。
 
 这里一个内部搭建的2k验证环境，用于模拟单机下的部署, 为模拟真实的环境，需要以下虚拟机配置。
 
@@ -19,9 +21,9 @@
 ## 硬件要求
 ```
 * 虚拟机操作系统，ubutun 20或debian都可以, 推荐vbox
-* 至少1CPU
+* 至少2CPU
 * 至少4G内存
-* 至少3块盘，系统盘20G 1块，数据盘1G(或自定义) 2块
+* 建议3块虚拟盘，系统盘20G 1块，数据盘1G(或自定义) 2块
 ```
 
 ## 软件安装
@@ -29,7 +31,8 @@
 ** 不需要root，但需要sudo权限 **
 
 # 安装依赖(不需安装显卡驱动)
-sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
+sudo aptitude install rsync make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
+sudo aptitude install chrony # 时间同步服务，按需
 
 # 创建数据目录
 sudo mkdir -p /data
@@ -87,7 +90,8 @@ fil-miner -- 软件根目录
         - env -- 多节点部署时单台机器上的变量切换脚本
         - lotus.sh -- 等同于lotus命令
         - miner.sh -- 等同于lotus-miner命令
-        - shed.sh -- 等同于lotus-shed命令
+        - shed.sh -- 等同于lotus-shed命令,常用工具集
+        - health.sh -- 等同于lotus-health命令，健康状态检查指令，可用于集成到监控系统
         - tailf-lotus.sh -- 快速tail -f lotus日志
         - tailf-miner.sh -- 快速tail -f lotus-miner日志
         - 其他脚本是基于上述命令的变程，使用前自行看一下内容
@@ -105,7 +109,7 @@ fil-miner -- 软件根目录
                       |
                 lotus-user-1
       /               |                 \
-lotus-storage-0  lotus-worker-1  lotus-worker-wdpost(wnpost)
+lotus-storage-0 lotus-worker-1(sealing) lotus-worker-wdpost(wnpost)
 
 
 进程说明

@@ -2,6 +2,8 @@
 
 此为生产环境下使用的部署，使用此文档前应掌握debug.md文档部署.
 
+TODO: 因集群需要至少三组以上机器，本文档为主备模式
+
 # 目录
 - [硬件要求](#硬件要求)
 - [软件安装](#软件安装)
@@ -18,7 +20,7 @@
 - [运行密封工人](#运行密封工人)
 
 ## 硬件要求
-**此为32GB, 64GB扇区要求，模拟环境2KB扇区同debug.md的硬件要求**
+**此为32GB, 64GB扇区要求，模拟环境2KB扇区见debug.md的硬件要求**
 ```
 两台真实miner主机, 配置：
 
@@ -26,14 +28,14 @@ CPU: AMD或Intel支持sha256运算的CPU, 最小核要求当前未验证，官�
 
 内存: 官方要求64GB以上，这里推荐256GB内存;
 
-显卡: NVIDIA RTX 2080 TI, NVIDIA RTX 3080, NVIDIA RTX 3090都可以
+显卡: NVIDIA RTX 2080 TI, NVIDIA RTX 3060, NVIDIA RTX 3080, NVIDIA RTX 3090等, 其他需要进一步测试
 
 SSD: 至少4T空间
 
 存储机自定义, 支持nfs, fuse, CUSTOM模式
-nfs, fuse会自动管理挂载, CUSTOM需要人工挂载，具体需要开发支持
+nfs, fuse会自动管理挂载, CUSTOM需要人工挂载，具体需要专业人员支持
 
-密封机器自定义，应P1P2与C2分离
+密封机器数量自定义，P1P2同一台组机器，C2单独一组机器
 ```
 
 ## 软件安装
@@ -41,7 +43,8 @@ nfs, fuse会自动管理挂载, CUSTOM需要人工挂载，具体需要开发支
 
 ### 通用依赖安装
 ```
-sudo aptitude install rsync chrony make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
+sudo aptitude install rsync make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
+sudo aptitude install chrony # 按需安装
 ```
 
 ### 显卡驱动安装
@@ -84,16 +87,17 @@ export LD_LIBRARY_PATH=/usr/local/cuda-11.6/lib64:$LD_LIBRARY_PATH
 
 ### 下载主网的fil-miner
 **2KB模拟环境不需要再下载此包，需要注意产生与模拟环境一个是mainnet版本，一个是debug版本。**
+**目前只提供amd二进制包，intel版需要另行编译**
 ```
 # 下载release版的fil-miner-linux-amd64-mainnet-xxx.tar.gz
 # 在https://github.com/wakanet/fil-miner/release/找到下载包
-tar -xzf fil-miner-linux-amd64-mainnet-xxx.tar.gz
+tar -xzf fil-miner-mainnet-xxx-amd.tar.gz
 cd ~/fil-miner
 . env.sh # 加载全局环境变量
 ./install.sh install
 ```
 
-## 运行主节点
+## 运行主节点程序
 
 准备以下数据
 ```
@@ -147,7 +151,7 @@ filc status
  # lotus-worker-wdpost停止运行中，后面主备切换用到
 ```
 
-## 运行备节点
+## 运行备节点程序
 
 准备以下数据
 ```
@@ -229,7 +233,7 @@ crontab -e
 
 链快照裁剪
 ```
-# 下载链快照
+# 下载链快照(服务器需自行搭建)
 wget -c http://10.202.89.95:8081/download/lotus_chain_snapshot.car
 
 # 确认当前链没有程序在用，关闭链程序; 
