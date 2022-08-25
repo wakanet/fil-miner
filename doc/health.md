@@ -28,20 +28,20 @@
 ```
 # 输出值>10时，最后两轮wdpost的掉的扇区数大于10值, 建议每个wdpost周期检查2次, 主网为15分钟1次
 # 处理：检查wdpost是否正常工作
-/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --repo-miner=/data/sdb/lotus-user-1/.lotusminer miner-wdpost-faults
+/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-wdpost-faults
 
 # 输入值>0时，当天UTC零时起的出块异常数量，建议每小时检查一次
 # 处理：检查wnpost是否正常工作
-/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --repo-miner=/data/sdb/lotus-user-1/.lotusminer miner-wnpost-err
+/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-wnpost-err
 
 # 输入值>0时存在异常的存储节点
 # 处理：检查miner机器上的挂载的存储是否正常
-/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --repo-miner=/data/sdb/lotus-user-1/.lotusminer miner-storage
+/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-storage
 
 # 可选，监控当前出块率，但正在密封时出块率会小于100%
-/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --repo-miner=/data/sdb/lotus-user-1/.lotusminer miner-wnpost-rate
+/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-wnpost-rate
 
 # 可选，监控当前24小时密封扇区输出，单值为个，需要根据实际产线worker数据来设定值，若小于指定产能, 则worker机器异常
 # 处理：排查worker机器是否全部在正常工作(lotus-miner fstar-worker stat-seal-time)
-/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --repo-miner=/data/sdb/lotus-user-1/.lotusminer miner-seal
+/root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-seal
 ```
