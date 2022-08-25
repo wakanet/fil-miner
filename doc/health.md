@@ -1,6 +1,6 @@
 # 节点状态告警
 
-## lotus节点上，监控以下值，达到指定阀值是为异常 
+## lotus节点上，监控以下值，达到指定阀值时为异常 
 ```
 # 输出值>3，链与当前调度差超过了3个高度, 说明同步不及时. 建议每个wdpost周期检查2次, 主网为15分钟1次
 # 处理：检查链相关环境是否正常
@@ -17,25 +17,25 @@
 
 # 以下为密封时按需监控
 
-# 可选，大于指定值时告警, 输出值当前本地消息池的消息量，按实现密封情况告警
+# 可选，大于指定值时告警, 输出值当前本地消息池的消息量，按实际密封情况告警
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus chain-mpool --current
 
 # 可选，大于指定值时告警，输出当前的消息gas费用的basefee值，当basefee值过高时，应告警是否暂停密封 
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus chain-basefee
 ```
 
-## 在miner节点上, 监控以下值，达到指定阀值是为异常
+## 在miner节点上, 监控以下值，达到指定阀值时为异常
 ```
-# 输出值>10时，最后两轮wdpost的掉的扇区数大于10值, 建议每个wdpost周期检查2次, 主网为15分钟1次
+# 输出值>10时，当最后两轮wdpost的掉的扇区数大于10时告警, 建议每个wdpost周期检查2次, 主网为15分钟1次
 # 处理：检查wdpost是否正常工作
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-wdpost-faults
 
-# 输入值>0时，当天UTC零时起的出块异常数量，建议每小时检查一次
+# 输输值>0时，当天UTC零时起的出块异常数量，建议每小时检查一次
 # 处理：检查wnpost是否正常工作
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-wnpost-err
 
 # 输入值>0时存在异常的存储节点
-# 处理：检查miner机器上的挂载的存储是否正常
+# 处理：检查miner机器上的挂载的存储是否正常(lotus-miner fstar-storage status)
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-storage
 
 # 可选，小于指定值时告警，监控当前出块率，但正在密封时出块率会小于100%　建议以平均出一个块的时间为统计周期
