@@ -26,7 +26,7 @@
 
 ## 在miner节点上, 监控以下值，达到指定阀值时为异常
 ```
-# 输出值>10时，当最后两轮wdpost的掉的扇区数大于10时告警, 建议每个wdpost周期检查2次, 主网为15分钟1次
+# 输出值>0时，当最后两轮wdpost的掉的扇区数告警, 建议每个wdpost周期检查2次, 主网为15分钟1次
 # 处理：检查wdpost是否正常工作
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-wdpost-faults
 
