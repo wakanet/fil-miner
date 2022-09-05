@@ -38,7 +38,7 @@
 # 处理：检查miner机器上的挂载的存储是否正常(lotus-miner fstar-storage status)
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-storage
 
-# 可选，小于指定值时告警，监控当前出块率，但正在密封时出块率会小于100%　建议以平均出一个块的时间为统计周期
+# 可选，小于指定值时告警(建议值<90.00)，监控当前出块率，但正在密封时出块率会小于100%　建议以平均出一个块的时间为统计周期
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-wnpost-rate
 
 # 可选，监控当前24小时密封扇区输出，单位为个，需要根据实际产线worker数据来设定值，若小于指定产能, 则worker机器有异常
