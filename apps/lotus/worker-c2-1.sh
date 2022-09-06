@@ -9,6 +9,9 @@ export FIL_PROOFS_USE_MULTICORE_SDR=1
 export FIL_PROOFS_PARENT_CACHE="/data/cache/filecoin-parents"
 export FIL_PROOFS_PARAMETER_CACHE="/data/cache/filecoin-proof-parameters/v28" 
 export worker_id_file="~/.lotusworker/worker-c2-1.id"
+export TMPDIR=/data/cache/tmp
+
+mkdir -p $TMPDIR
 
 if [ -z "FIL_PROOFS_GPU_MODE" ]; then
     export FIL_PROOFS_GPU_MODE="force"

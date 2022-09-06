@@ -8,7 +8,9 @@ export FIL_PROOFS_MAXIMIZE_CACHING=1  # open cache for 32GB or 64GB
 export FIL_PROOFS_USE_MULTICORE_SDR=1
 export FIL_PROOFS_PARENT_CACHE="/data/cache/filecoin-parents"
 export FIL_PROOFS_PARAMETER_CACHE="/data/cache/filecoin-proof-parameters/v28" 
+export TMPDIR=/data/cache/tmp
 
+mkdir -p $TMPDIR
 
 if [ -z "FIL_PROOFS_GPU_MODE" ]; then
     export FIL_PROOFS_GPU_MODE="auto"
