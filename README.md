@@ -22,7 +22,7 @@ mv bin/supd bin/fild
 
 # 打包
 . env.sh
-sup publish all
+./publish.sh
 cd publish
 tar -czf fil-miner-linux-amd64-mainnet-v1.xx.xx.tar.gz
 ```

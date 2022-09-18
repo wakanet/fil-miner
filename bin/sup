@@ -313,7 +313,8 @@ publishApp(){
     echo '#' "Publishing $cfg_name to $pub_dir"
     if [ -f "./publish.sh" ]; then
         echo "# Calling publish.sh"
-        sh ./publish.sh
+        sh -x ./publish.sh
+        return
     fi
 
     rm -rf $pub_dir/$app_path||exit 0
