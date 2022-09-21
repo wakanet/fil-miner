@@ -19,14 +19,20 @@
 - [启动wnpost工人](#启动wnpost工人)
 
 ## 硬件要求
+2k环境
 ```
 * 虚拟机操作系统，ubutun 20或debian都可以, 推荐vbox
 * 至少2CPU
 * 至少4G内存
 * 建议3块虚拟盘，系统盘20G 1块，数据盘1G(或自定义) 2块
 ```
+cablinet环境
+```
+参考mainnet.md的硬件要求
+```
 
 ## 软件安装
+2k环境
 ```
 ** 不需要root，但需要sudo权限 **
 
@@ -52,11 +58,10 @@ mkdir -p /data/cache/filecoin-proof-parameters/v28
 
 
 # 下载演示包
-# 演示包中含一个lotus-daemon-1,lotus-user-1,lotus-storage-0,lotus-worker-wnpost,lotus-worker-wdpost,lotus-worker-1进程
 # 在https://github.com/wakanet/fil-miner/release/找到下载包
 cd ~
-wget -c https://github.com/wakanet/fil-miner/release/xxx-debug.tar.gz . 
-tar -xzf xxx-debug.tar.gz
+wget -c https://github.com/wakanet/fil-miner/release/xxx.tar.gz . 
+tar -xzf xxx.tar.gz
 cd fil-miner
 ./install.sh install # 卸载./isntall.sh clean
 
@@ -64,6 +69,11 @@ cd fil-miner
 # fild, filc是supervisor的改版，supervisor是一个类似于systemd的进程管理器，
 # 为了统一平台适配性与独立性，增加了supervisor单独的进程管理
 filc status  # 显示出filc下管理的进程
+```
+
+calibnet环境
+```
+参考mainnet.md的软件环境
 ```
 
 ## fil-miner目录说明
@@ -212,7 +222,7 @@ filc restart lotus-storage-0 # 删除配置文件后重启lotus-storage-0服务
 cd ~/fil-miner
 . env.sh
 
-cp etc/supd/apps/tpl/lotus-user-1.ini etc/supd/apps # 准备miner进程
+cp etc/supd/apps/tpl/lotus-worker-1.ini etc/supd/apps # 准备miner进程
 filc reload
 filc status
 
