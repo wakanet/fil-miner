@@ -16,6 +16,8 @@ doc/advance.md
 
 # 已安装了fild不需再二次拉取
 go install github.com/gwaycc/supd/cmd/supd@latest
+go install github.com/free1139/etcd/cmd/etcd@v0.0.2
+go install github.com/free1139/etcd/cmd/etcdctl@v0.0.2
 mv bin/supd bin/fild
 
 # 发布apps/lotus，请参考开发文档使用./install.sh发布
