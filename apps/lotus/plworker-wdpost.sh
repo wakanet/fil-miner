@@ -60,7 +60,7 @@ fi
 
 worker_repo=$2
 if [ -z "$worker_repo" ]; then
-    worker_repo=/data/cache/.lotusworker1 
+    worker_repo=/data/cache/.lotusworker 
 fi
 
 mkdir -p $worker_repo
@@ -73,22 +73,11 @@ fi
 if [ -z "$MINER_API_INFO" ]; then
     export MINER_API_INFO="$(cat $miner_repo/token):$(cat $miner_repo/api)"
 fi
+# --no-local-storage=true \
 RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip \
-    AP_32G_MAX_CONCURRENT=0 \
-    PC1_32G_MAX_CONCURRENT=0 \
-    PC2_32G_MAX_CONCURRENT=0 \
-    C2_32G_MAX_CONCURRENT=1 \
     ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo run \
-    --listen=$netip:3454 \
-    --no-local-storage=true \
-    --addpiece=false \
-    --precommit1=false \
-    --unseal=false \
-    --precommit2=false \
-    --commit=true \
-    --replica-update=false \
-    --prove-replica-update2=false \
-    --regen-sector-key=false &
+    --listen=$netip:3456 \
+    --windowpost=true &
 pid=$!
 
 # set ulimit for process
