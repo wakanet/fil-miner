@@ -191,6 +191,37 @@ sudo mkdir -p /data/sdb/lotus-user-1/.lotusminer
 filc start lotus-worker-wdpost
 ```
 
+## 部署专用WnPoSt机器
+```
+# 安装fil-miner
+cd ~/fil-miner
+. env.sh
+cp etc/supd/apps/tpl/lotus-plworker-wnpost.ini etc/supd/apps
+./install.sh install
+filc status
+
+# 挂载存储
+sudo mkdir -p /data/cache/.lotusworker-wn
+sudo mount -t nfs 存储机地址:可读写路径 /data/nfs/1
+sudo vim /data/cache/.lotusworker-wn/storage.json
+#{
+#  "StoragePaths": [
+#    {
+#      "Path": "/data/nfs/1"
+#    }
+#  ]
+#}
+# :wq 保存并退出修改
+
+# 加载miner api信息
+sudo mkdir -p /data/sdb/lotus-user-1/.lotusminer
+# 将lotus-user-1机器上的.lotusminer/api与.lotusminer/token复制过来
+# !!!!注意!!!!此方式会将miner的api全部授权给worker机器，要注意信息安全
+
+# 启动worker
+filc start lotus-worker-wdpost
+```
+
 # 官方版本切换至fstar版本
 
 只需解决注意存储挂载的与钱包加密问题
