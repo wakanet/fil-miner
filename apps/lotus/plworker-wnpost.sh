@@ -73,9 +73,10 @@ fi
 if [ -z "$MINER_API_INFO" ]; then
     export MINER_API_INFO="$(cat $miner_repo/token):$(cat $miner_repo/api)"
 fi
-# --no-local-storage=true \
 RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip \
     ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo run \
+    --no-local-storage=true \
+    --no-swap=true \
     --listen=$netip:3457 \
     --winningpost=true &
 pid=$!

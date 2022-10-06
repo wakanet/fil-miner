@@ -80,6 +80,7 @@ RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip \
     C2_32G_MAX_CONCURRENT=0 \
     ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo run \
     --no-local-storage=true \
+    --no-swap=true \
     --listen=$netip:3455 \
     --commit=false &
 pid=$!

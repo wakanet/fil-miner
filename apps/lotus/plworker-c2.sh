@@ -81,6 +81,7 @@ RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip \
     ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo run \
     --listen=$netip:3454 \
     --no-local-storage=true \
+    --no-swap=true \
     --addpiece=false \
     --precommit1=false \
     --unseal=false \
