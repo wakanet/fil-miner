@@ -21,6 +21,7 @@ https://github.com/free1139/lotus.git
 cd ~
 git clone https://github.com/free1139/lotus.git
 cd lotus
+git checkout devnet
 make clean
 ./install.sh # 默认为mainet网络，
 # ./install.sh calibnet # calibration网络
