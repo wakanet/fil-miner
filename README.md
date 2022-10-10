@@ -39,3 +39,8 @@ doc/plworker.md
 doc/devnet.md
 ```
 
+多签保护SP owner地址
+```
+doc/msig.md
+```
+
