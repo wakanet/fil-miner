@@ -4,13 +4,6 @@ fil-miner部署需要熟练掌握linux的运维知识, 本安装包本质是对�
 
 文档不足的地方请善于使用--help文档，例如：lotus --help, lotus-miner --help
 
-按以下顺序依次深入掌握
-```
-doc/debug.md
-doc/product.md
-doc/advance.md
-```
-
 本二进制发布指令
 ```
 
@@ -27,5 +20,22 @@ mv bin/supd bin/fild
 ./publish.sh
 cd publish
 tar -czf fil-miner-linux-amd64-mainnet-v1.xx.xx.tar.gz
+```
+
+fstar部署
+```
+doc/0_instr.md
+doc/1_debug.md # 单机部署
+doc/2_mainnet.md # 主备部署
+```
+
+官方版本部署
+```
+doc/plworker.md
+```
+
+构建2k创世节点
+```
+doc/devnet.md
 ```
 

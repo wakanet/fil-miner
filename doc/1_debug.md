@@ -2,13 +2,12 @@
 
 单机节点主要用于演示与示例，掌握后结合mainnet.md进行生产部署。
 
-这里一个内部搭建的2k验证环境，用于模拟单机下的部署, 为模拟真实的环境，需要以下虚拟机配置。
-
 本文档旨在构建一个最简的模拟lotus密封环境，用于学习、测试、验证lotus的使用与维护。
 
 # 目录
 - [硬件要求](#硬件要求)
-- [软件安装](#软件安装)
+- [依赖安装](#依赖安装)
+- [软件部署](#软件部署)
 - [fil-miner目录说明](#fil-miner目录说明)
 - [fil-miner进程关系图](#fil-miner进程关系图)
 - [启动链](#启动链)
@@ -17,6 +16,7 @@
 - [启动密封工人](#启动密封工人)
 - [启动wdpost工人](#启动wdpost工人)
 - [启动wnpost工人](#启动wnpost工人)
+- [启动CC密封](#启动CC密封)
 
 ## 硬件要求
 2k环境
@@ -28,10 +28,13 @@
 ```
 cablinet环境
 ```
-参考mainnet.md的硬件要求
+# 参考mainnet.md的硬件要求
+sudo aptitude install rsync make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
+sudo aptitude install chrony # 按需安装
+sudo aptitude install nvidia-driver-510-server
 ```
 
-## 软件安装
+## 依赖安装
 2k环境
 ```
 ** 不需要root，但需要sudo权限 **
@@ -39,7 +42,15 @@ cablinet环境
 # 安装依赖(不需安装显卡驱动)
 sudo aptitude install rsync make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
 sudo aptitude install chrony # 时间同步服务，按需
+```
 
+32GB及以下环境
+```
+参考mainnet.md的软件环境
+```
+
+## 软件部署
+```
 # 创建数据目录
 sudo mkdir -p /data
 
@@ -69,11 +80,6 @@ cd fil-miner
 # fild, filc是supervisor的改版，supervisor是一个类似于systemd的进程管理器，
 # 为了统一平台适配性与独立性，增加了supervisor单独的进程管理
 filc status  # 显示出filc下管理的进程
-```
-
-calibnet环境
-```
-参考mainnet.md的软件环境
 ```
 
 ## fil-miner目录说明
@@ -271,4 +277,15 @@ cd script/lotus/lotus-user
 filc status # 确认进程中有lotus-worker-wnpost
 
 filc start lotus-worker-wnpost # 启动进程级wnpost工人
+```
+
+## 启动CC密封
+```
+cd ~/fil-miner
+. env.sh
+
+cd script/lotus/lotus-user
+. env/miner-1.sh
+./miner.sh pledge-sector start # 自动发送CC pledge指令
+# ./miner.sh pledge-sector stop # 停止发送CC pledge指令
 ```

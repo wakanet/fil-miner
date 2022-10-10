@@ -2,6 +2,8 @@
 
 若版本已过时，请以官方指令为准，本版本适用于示例以及小规模部署。
 
+建议在单机上完成部署熟释后再拆分到各机器部署。
+
 ## 下载fil-miner
 ```
 cd ~
@@ -220,6 +222,15 @@ sudo mkdir -p /data/sdb/lotus-user-1/.lotusminer
 
 # 启动worker
 filc start lotus-worker-wdpost
+```
+
+## 开始CC密封
+```
+cd ~/fil-miner
+. env.sh
+cd script/lotus/lotus-user
+. env/miner-1.sh
+./miner.sh sectors pledge # 一次只能发起一个Addpiece
 ```
 
 # 官方版本切换至fstar版本
