@@ -1,15 +1,15 @@
 #!/bin/sh
 
-root=$1
-repo=$2
+repo=$1
+root=$2
 authAddr=$3
 httpAddr=$4
 pxfsAddr=$5
-if [ -z "$root" ]; then
-    root=$PRJ_ROOT/var/lotus-storage/
-fi
 if [ -z "$repo" ]; then
-    repo="/data/zfs"
+    repo=$PRJ_ROOT/var/lotus-storage/
+fi
+if [ -z "$root" ]; then
+    root="/data/zfs"
 fi
 if [ -z "$authAddr" ]; then
     authAddr=":1330"
@@ -21,11 +21,11 @@ if [ -z "$pxfsAddr" ]; then
     pxfsAddr=":1332"
 fi
 
-./lotus-storage --storage-root=$root \
+../../bin/openz \
     --addr-auth="$authAddr" \
     --addr-http="$httpAddr" \
     --addr-pxfs="$pxfsAddr" \
-    daemon --storage-repo="$repo" &
+    daemon --root=$root --repo="$repo" &
 pid=$!
 
 # set ulimit for process
