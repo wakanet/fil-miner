@@ -21,11 +21,11 @@ if [ -z "$pxfsAddr" ]; then
     pxfsAddr=":1332"
 fi
 
-../../bin/openz \
+../../bin/bchain-storage \
     --addr-auth="$authAddr" \
     --addr-http="$httpAddr" \
     --addr-pxfs="$pxfsAddr" \
-    daemon --root=$root --repo="$repo" &
+    daemon --root=$root --repo="$repo" --export-nfs=true &
 pid=$!
 
 # set ulimit for process

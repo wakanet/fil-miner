@@ -13,6 +13,9 @@ go install github.com/gwaycc/etcd/cmd/etcd@v0.0.3
 go install github.com/gwaycc/etcd/cmd/etcdctl@v0.0.3
 mv bin/supd bin/fild
 
+# 使用lotus-storage
+go install github.com/gwaycc/bchain-storage/cmd/bchain-storage@v1.0.0
+
 # 发布apps/lotus，请参考开发文档使用./install.sh发布，官方的版本请参阅doc/plworker.md。
 
 # 打包
