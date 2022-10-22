@@ -38,19 +38,19 @@ if [ ! -z "$gpu" ]; then
     #"NVIDIA Quadro RTX 6000:4608, NVIDIA TITAN RTX:4608, NVIDIA Tesla V100:5120, NVIDIA Tesla P100:3584, NVIDIA Tesla T4:2560, NVIDIA Quadro M5000:2048, NVIDIA GeForce RTX 3090:10496, NVIDIA GeForce RTX 3080:8704, NVIDIA GeForce RTX 3070:5888, NVIDIA GeForce RTX 2080 Ti:4352, NVIDIA GeForce RTX 2080 SUPER:3072, NVIDIA GeForce RTX 2080:2944, NVIDIA GeForce RTX 2070 SUPER:2560, NVIDIA GeForce GTX 1080 Ti:3584, NVIDIA GeForce GTX 1080:2560, NVIDIA GeForce GTX 2060:1920, NVIDIA GeForce GTX 1660 Ti:1536, NVIDIA GeForce GTX 1060:1280, NVIDIA GeForce GTX 1650 SUPER:1280, NVIDIA GeForce GTX 1650:896"
     case $gpu in
         *"GeForce RTX 3090"):
-            export BELLMAN_CUSTOM_GPU="$gpu:10496"
+            export RUST_GPU_TOOLS_CUSTOM_GPU="$gpu:10496"
         ;;
         *"GeForce RTX 3080"):
-            export BELLMAN_CUSTOM_GPU="$gpu:8704"
+            export RUST_GPU_TOOLS_CUSTOM_GPU="$gpu:8704"
         ;;
         *"GeForce RTX 3070"):
-            export BELLMAN_CUSTOM_GPU="$gpu:5888"
+            export RUST_GPU_TOOLS_CUSTOM_GPU="$gpu:5888"
         ;;
         *"GeForce RTX 2080 Ti"):
-            export BELLMAN_CUSTOM_GPU="$gpu:4352"
+            export RUST_GPU_TOOLS_CUSTOM_GPU="$gpu:4352"
         ;;
         *"GeForce RTX 2080 SUPER"):
-            export BELLMAN_CUSTOM_GPU="$gpu:3072"
+            export RUST_GPU_TOOLS_CUSTOM_GPU="$gpu:3072"
         ;;
         #TODO: more match
     esac
