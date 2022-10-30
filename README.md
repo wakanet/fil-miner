@@ -10,11 +10,13 @@ fil-miner部署需要熟练掌握linux的运维知识, 本安装包本质是对�
 # 已安装了fild不需再二次拉取
 go install github.com/gwaycc/supd/cmd/supd@latest
 mv bin/supd bin/fild
-go install github.com/gwaycc/etcd/cmd/etcd@v0.0.3
-go install github.com/gwaycc/etcd/cmd/etcdctl@v0.0.3
 
 # 使用lotus-storage
 go install github.com/gwaycc/bchain-storage/cmd/bchain-storage@v1.0.0
+
+# 使用etcd
+go install github.com/gwaycc/etcd/cmd/etcd@v0.0.3
+go install github.com/gwaycc/etcd/cmd/etcdctl@v0.0.3
 
 # 使用ipfs
 go install github.com/ipfs/kubo/cmd/ipfs@v0.16.0
