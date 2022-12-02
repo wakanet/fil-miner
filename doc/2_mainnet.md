@@ -45,13 +45,14 @@ nfs, fuse会自动管理挂载, CUSTOM需要人工挂载，具体需要专业人
 ```
 sudo aptitude install rsync make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
 sudo aptitude install chrony # 按需安装
+sudo aptitude install nfs-client # 按需安装
 ```
 
 ### 显卡驱动安装
 **2k环境不需要安装此显卡要求**
 
 #### 在线安装
-sudo aptitude install nvidia-driver-510-server
+sudo aptitude install nvidia-driver-510-server nvidia-cuda-toolkit
 
 #### 本地安装
 因此当前版本要求使用CUDA进行算法运算，需要安装测试过的显卡驱动包.  
@@ -68,7 +69,7 @@ cp /etc/modprobe.d/nvidia-installer-disable-nouveau.conf ~/nvidia-installer-disa
 echo "blacklist nouveau">/etc/modprobe.d/nvidia-installer-disable-nouveau.conf
 echo "options nouveau modeset=0">/etc/modprobe.d/nvidia-installer-disable-nouveau.conf
 update-initramfs -u
-#update-grub
+update-grub
 
 ./cuda_11.6.2_510.47.03_linux.run # 建议本nvidia官方包中的显卡驱动以便cuda尽可以兼容
 # 或静默安装 ./cuda_11.6.2_510.47.03_linux.run --silent --driver --toolkit
