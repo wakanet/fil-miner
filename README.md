@@ -20,6 +20,7 @@ go install github.com/gwaycc/etcd/cmd/etcdctl@v0.0.3
 
 # 使用ipfs
 go install github.com/ipfs/kubo/cmd/ipfs@v0.16.0
+go install github.com/Kubuxu/go-ipfs-swarm-key-gen/ipfs-swarm-key-gen@master
 
 # 发布apps/lotus，请参考开发文档使用./install.sh发布，官方的版本请参阅doc/plworker.md。
 
