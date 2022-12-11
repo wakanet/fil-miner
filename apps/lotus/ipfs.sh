@@ -17,8 +17,13 @@ if [ ! -d "$repo" ]; then
     fi
 fi
 
-IPFS_PATH=$repo LIBP2P_FORCE_PNET=1 ../../bin/ipfs daemon &
-pid=$!
+if [ "$repo" = "/data/cache/.ipfs" ]; then
+    IPFS_PATH=$repo LIBP2P_FORCE_PNET=1 ../../bin/ipfs daemon --routing=dhtclient &
+    pid=$!
+else
+    IPFS_PATH=$repo LIBP2P_FORCE_PNET=1 ../../bin/ipfs daemon &
+    pid=$!
+fi
 
 # set ulimit for process
 nropen=$(cat /proc/sys/fs/nr_open)
