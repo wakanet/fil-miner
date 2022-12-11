@@ -3,16 +3,16 @@
 repo=$1
 if [ -z "$repo" ]; then
     repo=/data/cache/.ipfs
-fi
+fi 
 
 if [ ! -d "$repo" ]; then
     # TODO: init port
     mkdir -p $repo
-    ../../bin/ipfs --repo-dir=$repo init
+    IPFS_PATH=$repo ../../bin/ipfs init
     cp ipfs-swarm.key $repo/swarm.key
 fi
 
-LIBP2P_FORCE_PNET=1 ../../bin/ipfs --repo-dir=$repo daemon &
+IPFS_PATH=$repo LIBP2P_FORCE_PNET=1 ../../bin/ipfs daemon &
 pid=$!
 
 # set ulimit for process
@@ -29,7 +29,7 @@ fi
 
 echo "waiting the daemon up"
 sleep 10
-../../bin/ipfs --repo-dir=$repo bootstrap rm all
+IPFS_PATH=$repo ../../bin/ipfs --repo-dir=$repo bootstrap rm all
 
 if [ ! -z "$pid" ]; then
     wait "$pid"

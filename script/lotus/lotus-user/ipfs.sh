@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sudo $PRJ_ROOT/bin/ipfs --repo-dir=$ipfsrepo $@
+sudo IPFS_PATH=$ipfsrepo $PRJ_ROOT/bin/ipfs $@
