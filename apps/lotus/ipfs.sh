@@ -5,8 +5,9 @@ if [ -z "$repo" ]; then
     repo=/data/cache/.ipfs
 fi
 
-if [ ! -d "$epo" ]; then
+if [ ! -d "$repo" ]; then
     # TODO: init port
+    mkdir -p $repo
     ../../bin/ipfs --repo-dir=$repo init
     cp ipfs-swarm.key $repo/swarm.key
 fi
