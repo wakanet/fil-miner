@@ -5,5 +5,6 @@
 !/*.yaml
 !/*.toml
 !/*.cfg
+!*.key
 !/*.sql
 !/.gitignore
