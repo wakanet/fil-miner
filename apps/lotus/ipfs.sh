@@ -6,10 +6,15 @@ if [ -z "$repo" ]; then
 fi 
 
 if [ ! -d "$repo" ]; then
-    # TODO: init port
     mkdir -p $repo
-    IPFS_PATH=$repo ../../bin/ipfs init
+    IPFS_PATH=$repo ../../bin/ipfs init -e
     cp ipfs-swarm.key $repo/swarm.key
+    IPFS_PATH=$repo ../../bin/ipfs config --json "Bootstrap" null
+    if [ "$repo" = "/data/cache/.ipfs" ]; then
+        IPFS_PATH=$repo ../../bin/ipfs config --json "Addresses.API" '"/ip4/127.0.0.1/tcp/15001"'
+        IPFS_PATH=$repo ../../bin/ipfs config --json "Addresses.Gateway" '"/ip4/127.0.0.1/tcp/18080"'
+        IPFS_PATH=$repo ../../bin/ipfs config --json "Addresses.Swarm" '["/ip4/0.0.0.0/tcp/14001","/ip6/::/tcp/14001","/ip4/0.0.0.0/udp/14001/quic","/ip6/::/udp/14001/quic"]'
+    fi
 fi
 
 IPFS_PATH=$repo LIBP2P_FORCE_PNET=1 ../../bin/ipfs daemon &
@@ -26,10 +31,6 @@ else
     echo "set prlimit failed, command:prlimit -p $pid --nofile=655350"
     exit 0
 fi
-
-echo "waiting the daemon up"
-sleep 10
-IPFS_PATH=$repo ../../bin/ipfs --repo-dir=$repo bootstrap rm all
 
 if [ ! -z "$pid" ]; then
     wait "$pid"
