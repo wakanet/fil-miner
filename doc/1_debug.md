@@ -182,7 +182,7 @@ filc status
 cd script/lotus/lotus-user
 . env/miner-1.sh
 ./lotus.sh wallet new bls # 创建一个t3钱包地址
-./lotus.sh wallet list # 将钱包地址发管理员要测试币
+# sudo lotus send t3地址1000从水龙头这获得
 ./lotus.sh wallet list # 确认水龙头的钱到帐号，可以创建miner
 
 ./lotus.sh fetch-params 2KiB # 首次使用时需手工检查参数包, 其他为512MiB, 32GiB, 64GiB

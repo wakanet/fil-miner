@@ -13,12 +13,12 @@ if [ ! -d "$repo" ]; then
     if [ "$repo" = "/data/cache/.ipfs" ]; then
         IPFS_PATH=$repo ../../bin/ipfs config --json "Addresses.API" '"/ip4/127.0.0.1/tcp/15001"'
         IPFS_PATH=$repo ../../bin/ipfs config --json "Addresses.Gateway" '"/ip4/127.0.0.1/tcp/18080"'
-        IPFS_PATH=$repo ../../bin/ipfs config --json "Addresses.Swarm" '["/ip4/0.0.0.0/tcp/14001","/ip6/::/tcp/14001","/ip4/0.0.0.0/udp/14001/quic","/ip6/::/udp/14001/quic"]'
+        IPFS_PATH=$repo ../../bin/ipfs config --json "Addresses.Swarm" '["/ip4/127.0.0.1/tcp/14001","/ip6/::/tcp/14001","/ip4/127.0.0.1/udp/14001/quic","/ip6/::/udp/14001/quic"]'
     fi
 fi
 
 if [ "$repo" = "/data/cache/.ipfs" ]; then
-    IPFS_PATH=$repo LIBP2P_FORCE_PNET=1 ../../bin/ipfs daemon --routing=dhtclient &
+    IPFS_PATH=$repo LIBP2P_FORCE_PNET=1 ../../bin/ipfs  --offline daemon &
     pid=$!
 else
     IPFS_PATH=$repo LIBP2P_FORCE_PNET=1 ../../bin/ipfs daemon &
