@@ -16,6 +16,7 @@
 - [启动密封工人](#启动密封工人)
 - [启动wdpost工人](#启动wdpost工人)
 - [启动wnpost工人](#启动wnpost工人)
+- [启动有效数据密封(stateless)](#启动有效数据密封(stateless))
 - [启动CC密封](#启动CC密封)
 
 ## 硬件要求
@@ -68,11 +69,9 @@ ln -s /data/zfs /data/sdb
 mkdir -p /data/cache/filecoin-proof-parameters/v28 
 
 
-# 下载演示包
-# 在https://github.com/wakanet/fil-miner/release/找到下载包
+# 下载fil-miner管理器
 cd ~
-wget -c https://github.com/wakanet/fil-miner/release/xxx.tar.gz . 
-tar -xzf xxx.tar.gz
+git clone https://github.com/wakanet/fil-miner.git
 cd fil-miner
 ./install.sh install # 卸载./isntall.sh clean
 
@@ -101,20 +100,18 @@ fil-miner -- 软件根目录
     - denyhosts -- 防火墙配置脚本
     - boot_*.sh -- fil-miner系统安装脚本
     - fild.service -- fil-miner系统自启动配置文件
-    - lotus 
-      - lotus-user -- lotus运行日常使用的脚本
-        - env -- 多节点部署时单台机器上的变量切换脚本
-        - lotus.sh -- 等同于lotus命令
-        - miner.sh -- 等同于lotus-miner命令
-        - shed.sh -- 等同于lotus-shed命令,常用工具集
-        - health.sh -- 等同于lotus-health命令，健康状态检查指令，可用于集成到监控系统
-        - tailf-lotus.sh -- 快速tail -f lotus日志
-        - tailf-miner.sh -- 快速tail -f lotus-miner日志
-        - 其他脚本是基于上述命令的变程，使用前自行看一下内容
-        - export-chain.sh -- 导出链快照
-        - test-wdpost.sh -- 手工运行wdpost测试
-        - umount-storage.sh -- 手工清理/data/nfs/下的挂载
-
+    - lotus -- lotus运行日常使用的脚本
+      - env -- 多节点部署时单台机器上的变量切换脚本
+      - lotus.sh -- 等同于lotus命令
+      - miner.sh -- 等同于lotus-miner命令
+      - shed.sh -- 等同于lotus-shed命令,常用工具集
+      - health.sh -- 等同于lotus-health命令，健康状态检查指令，可用于集成到监控系统
+      - tailf-lotus.sh -- 快速tail -f lotus日志
+      - tailf-miner.sh -- 快速tail -f lotus-miner日志
+      - 其他脚本是基于上述命令的变程，使用前自行看一下内容
+      - export-chain.sh -- 导出链快照
+      - test-wdpost.sh -- 手工运行wdpost测试
+      - umount-storage.sh -- 手工清理/data/nfs/下的挂载
 ```
 
 ## fil-miner进程关系图
@@ -134,21 +131,39 @@ lotus-daemon-1 关联目录与文件
 /data/cache/.lotus
 
 lotus-user-1 关联目录与文件
-/data/sdb/lotus-user-1/.lotusminer
-/data/sdb/lotus-user-1/.lotus-proxy/api, /data/sdb/lotus-user-1/.lotus-proxy/token # 若存在，优先使用
+/data/sdb-1/.lotusminer
+/data/sdb-1/.lotus-proxy/api, /data/sdb-1/.lotus-proxy/token # 若存在，优先使用
 /data/cache/.lotus/api, /data/cache/.lotus/token # 若.lotus-proxy不存在，则启动此目录
 
 lotus-storage-0 关联目录与文件
 /data/zfs,fil-miner/var/lotus-storage-0
 
 lotus-worker-1 关联目录与文件
-/data/sdb/lotus-user-1/.lotusminer/worker_api, /data/sdb/lotus-user-1/.lotusminer/worker_token, /data/cache/.lotusworker
+/data/sdb-1/.lotusminer/worker_api, /data/sdb-1/.lotusminer/worker_token, /data/cache/.lotusworker
 
 lotus-worker-wnpost 关联目录与文件
-/data/sdb/lotus-user-1/.lotusminer/worker_api, /data/sdb/lotus-user-1/.lotusminer/worker_token, /data/cache/.lotusworker
+/data/sdb-1/.lotusminer/worker_api, /data/sdb-1/.lotusminer/worker_token, /data/cache/.lotusworker
 
 lotus-worker-wdpost 关联目录与文件
-/data/sdb/lotus-user-1/.lotusminer/worker_api, /data/sdb/lotus-user-1/.lotusminer/worker_token, /data/cache/.lotusworker
+/data/sdb-1/.lotusminer/worker_api, /data/sdb-1/.lotusminer/worker_token, /data/cache/.lotusworker
+```
+
+## 创建创世节点(开源版）
+```
+cd ~
+git clone https://github.com/free1139/lotus.git
+cd lotus
+git checkout devnet
+make clean
+./install.sh debug # 首次编译
+
+#./clean-bootstrap.sh # 清理原创世节点
+./init-bootstrap.sh
+# 等完成初始化后执行以下
+./deploy-bootstrap.sh
+
+# 生成lotus二进制命令
+./install.sh debug
 ```
 
 ## 启动链 
@@ -160,7 +175,7 @@ cp etc/supd/apps/tpl/lotus-daemon-1.ini etc/supd/apps # 准备lotus链进程
 filc reload
 filc status
 
-cd script/lotus/lotus-user
+cd script/lotus
 ./lotus.sh fetch-params 2KiB # 首次使用时需手工检查参数包, 其他为512MiB, 32GiB, 64GiB
 
 filc start lotus-daemon-1
@@ -175,11 +190,11 @@ filc start lotus-daemon-1
 cd ~/fil-miner
 . env.sh
 
-cp etc/supd/apps/tpl/lotus-user-1.ini etc/supd/apps # 准备miner进程
+cp etc/supd/apps/tpl-1.ini etc/supd/apps # 准备miner进程
 filc reload 
 filc status
 
-cd script/lotus/lotus-user
+cd script/lotus
 . env/miner-1.sh
 ./lotus.sh wallet new bls # 创建一个t3钱包地址
 # sudo lotus send t3地址1000从水龙头这获得
@@ -206,13 +221,13 @@ cp etc/supd/apps/tpl/lotus-storage-0.ini etc/supd/apps # 准备存储服务器�
 filc reload
 filc status
 
-cd script/lotus/lotus-user
+cd script/lotus
 . env/miner-1.sh
 filc status # 确认进程中有lotus-storage-0
 filc start lotus-storage-0 # 会自动配置nfs文件，nfs文件将会是只读；写操作需要通过http来操作。
 filc status # 确认lotus-storage-0是绿的
 
-# 以下依赖于lotus-user-1已启动
+# 以下依赖于lotus-user-1已启动(默认使用bcstorage,NFS请改脚本)
 ./init-storage-dev.sh # 此脚本内容是挂载lotus-storage-0的存储，更多存储方式参考开发文档或者./miner.sh fstar-storage --help
 # 查阅miner中的存储节点状态, 此时显示有两个节点存储被miner管理了
 ./miner.sh fstar-storage status --debug 
@@ -232,7 +247,7 @@ cp etc/supd/apps/tpl/lotus-worker-1.ini etc/supd/apps # 准备miner进程
 filc reload
 filc status
 
-cd script/lotus/lotus-user
+cd script/lotus
 . env/miner-1.sh
 filc status # 确认进程中有lotus-worker-1
 
@@ -255,7 +270,7 @@ cp etc/supd/apps/tpl/lotus-worker-wdpost.ini etc/supd/apps # 准备wdpost进程
 filc reload
 filc status
 
-cd script/lotus/lotus-user
+cd script/lotus
 . env/miner-1.sh
 filc status # 确认进程中有lotus-worker-wdpost
 
@@ -272,11 +287,34 @@ cp etc/supd/apps/tpl/lotus-worker-wnpost.ini etc/supd/apps # 准备wnpost进程
 filc reload
 filc status
 
-cd script/lotus/lotus-user
+cd script/lotus
 . env/miner-1.sh
 filc status # 确认进程中有lotus-worker-wnpost
 
 filc start lotus-worker-wnpost # 启动进程级wnpost工人
+```
+
+## 签名有效数据
+```
+cd ~/fil-miner
+. env.sh
+cd script/lotus
+cp ~/lotus/scripts/t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy.dat .
+./lotus.sh wallet import t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy.dat
+./lotus.sh wallet new # 创建一个有效数据地址
+sudo lotus send [地址] 10000 # 从水龙头处获得点钱
+./lotus.sh filplus grant-datacap --from t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy [地址] 10240
+```
+
+## 启动有效数据密封(stateless)
+```
+# 设置离线传输询价
+./miner.sh storage-deals set-ask --price 0.0000000 --verified-price 0.0000000 --min-piece-size 256B --max-piece-size 2KiB
+
+# 专用离线版本
+echo "$HOME/fil-miner/script/lotus/lotus.sh" >> /tmp/files.txt
+echo "$HOME/fil-miner/script/lotus/miner.sh" >> /tmp/files.txt
+./miner.sh storage-deals offline-make --from [有效数据地址] /tmp/files.txt # 
 ```
 
 ## 启动CC密封
@@ -284,8 +322,12 @@ filc start lotus-worker-wnpost # 启动进程级wnpost工人
 cd ~/fil-miner
 . env.sh
 
-cd script/lotus/lotus-user
+cd script/lotus
 . env/miner-1.sh
 ./miner.sh pledge-sector start # 自动发送CC pledge指令
 # ./miner.sh pledge-sector stop # 停止发送CC pledge指令
 ```
+
+***备注:***
+开源版本请使用官方命令文档
+
