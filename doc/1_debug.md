@@ -301,9 +301,12 @@ cd ~/fil-miner
 cd script/lotus
 cp ~/lotus/scripts/t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy.dat .
 ./lotus.sh wallet import t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy.dat
-./lotus.sh wallet new # 创建一个有效数据地址
-sudo lotus send [地址] 10000 # 从水龙头处获得点钱
-./lotus.sh filplus grant-datacap --from t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy [地址] 10240
+./lotus.sh wallet new # 创建公证人地址
+sudo lotus send [公证人地址] 10
+./shed.sh verifreg add-verifier t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy [公证人地址] 1024000 # 添加公证人
+./lotus.sh wallet new # 创建一个有效数据客户端地址
+sudo lotus send [客户端地址] 10000 # 从水龙头处获得点钱
+./lotus.sh filplus grant-datacap --from [公证人地址] [客户端地址] 10240
 ```
 
 ## 启动有效数据密封(stateless)
