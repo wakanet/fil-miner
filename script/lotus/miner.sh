@@ -15,7 +15,7 @@ fi
 if [ $init -eq 1 ];then
     sudo IPFS_GATEWAY=$IPFS_GATEWAY FIL_PROOFS_PARAMETER_CACHE=$FIL_PROOFS_PARAMETER_CACHE $PRJ_ROOT/apps/lotus/lotus-miner --repo=$lotusrepo --miner-repo=$filrepo "$@"
     sudo mv $filrepo/config.toml $filrepo/config.toml.bak
-    sudo cp $PRJ_ROOT/apps/lotus/config-miner.toml $filrepo/config.toml
+    sudo cp $PRJ_ROOT/apps/lotus/config-miner-seal.toml $filrepo/config.toml
     sudo cp $PRJ_ROOT/apps/lotus/config-withdraw.toml $filrepo/withdraw.toml
     netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one eth card.
     if [ ! -z $netip ]; then
