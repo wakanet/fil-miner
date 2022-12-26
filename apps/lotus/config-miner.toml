@@ -131,10 +131,10 @@
   #EnableMarkets = true
 
   # env var: LOTUS_SUBSYSTEMS_ENABLEWNPOST
-  #EnableWnPoSt = false
+  #EnableWnPoSt = true
 
   # env var: LOTUS_SUBSYSTEMS_ENABLEWDPOST
-  #EnableWdPoSt = false
+  #EnableWdPoSt = true
 
   # type: string
   # env var: LOTUS_SUBSYSTEMS_SEALERAPIINFO
@@ -469,13 +469,13 @@ WaitDealsDelay = "1h0m0s"
   BatchPreCommits = true
   MaxPreCommitBatch = 200
   MinPreCommitBatch = 1
-  PreCommitBatchWait = "0h30m0s"
-  PreCommitBatchSlack = "0h30m0s"
+  PreCommitBatchWait = "0h15m0s"
+  PreCommitBatchSlack = "0h15m0s"
   AggregateCommits = true
   MaxCommitBatch = 200
   MinCommitBatch = 1
-  CommitBatchWait = "0h30m0s"
-  CommitBatchSlack = "0h30m0s"
+  CommitBatchWait = "0h15m0s"
+  CommitBatchSlack = "0h15m0s"
 #  TerminateBatchMax = 100
 #  TerminateBatchMin = 1
 #  TerminateBatchWait = "5m0s"
