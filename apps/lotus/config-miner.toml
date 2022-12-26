@@ -3,7 +3,7 @@
   #
   # type: string
   # env var: LOTUS_API_LISTENADDRESS
-  ListenAddress = "/ip4/127.0.0.1/tcp/2346/http"
+  ListenAddress = "/ip4/127.0.0.1/tcp/2356/http"
   #ListenAddress = "/ip4/127.0.0.1/tcp/2345/http"
 
   # type: string
@@ -110,7 +110,7 @@
 
 [WorkerAPI]
   # env var: LOTUS_WORKERAPI_LISTENADDRESS
-  ListenAddress = "/ip4/127.0.0.1/tcp/2348/http"
+  ListenAddress = "/ip4/127.0.0.1/tcp/2358/http"
 
 
 [Subsystems]
