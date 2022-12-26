@@ -1,5 +1,5 @@
 #!/bin/sh
 
-addr="t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy"
+addr="t1aw5glzvhqyobyshh4bq3pmlseapf7ofknyxr2eq"
 
-./miner.sh storage-deals offline-make --from $addr /tmp/files.txt
+./miner.sh storage-deals offline-make --from $addr /tmp/files1.txt
