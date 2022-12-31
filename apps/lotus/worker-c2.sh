@@ -76,10 +76,7 @@ mkdir -p $worker_repo
 mkdir -p $miner_repo
 mkdir -p $storage_repo
 
-netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one eth card.
-if [ -z $netip ]; then
-    netip="127.0.0.1"
-fi
+netip="`/bin/sh ./ip.sh`"
 cpu_bind=$(./lotus-worker pledge --cpu-bind)
 cpu_num=$(./lotus-worker pledge --cpu-num)
 RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --listen-addr="$netip:1283" --parallel-pledge=0 --parallel-precommit1=0 --parallel-precommit2=0 --parallel-commit=0 --commit2-srv=true &

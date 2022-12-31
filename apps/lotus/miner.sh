@@ -63,10 +63,7 @@ echo "Set $netip to config.toml"
 if [ ! -f $minerdir/config.toml.bak ]; then
     cp -rf $minerdir/config.toml $minerdir/config.toml.bak
 fi
-netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one eth card.
-if [ ! -z $netip ]; then
-    sed -i "s/127.0.0.1/$netip/g" $minerdir/config.toml
-fi
+netip="`/bin/sh ./ip.sh`"
 
 # BELLMAN_NO_GPU=1 RUST_LOG=info RUST_BACKTRACE=1 ./lotus-miner --repo=$repodir --miner-repo=$minerdir run --nosync 
 #pid=$!

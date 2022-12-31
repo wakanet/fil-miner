@@ -25,8 +25,17 @@
 sealedAuth="lotus-sealed-1:BC894282F3131961E80584784D2D6A41"
 unsealAuth="lotus-unseal-1:9B903B22392EF60AE4FB04A1B299972A"
 
+sudo mkdir -p /data/zfs/lotus-user-1/sealed
+sudo mkdir -p /data/zfs/lotus-user-1/unseal
+sudo mkdir -p /data/nfs/lotus-user-1
+
 # for local, 1TB limit, when need to scale, see ./miner.sh fstar-storage scale --help
 netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one eth card.
+for ip in $netip
+do
+    netip=$ip
+    break
+done
 if [ -z $netip ]; then
     netip=127.0.0.1
 fi

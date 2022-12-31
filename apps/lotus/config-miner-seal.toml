@@ -197,6 +197,7 @@
   # type: Duration
   # env var: LOTUS_DEALMAKING_EXPECTEDSEALDURATION
   #ExpectedSealDuration = "24h0m0s"
+  ExpectedSealDuration = "72h0m0s"
 
   # Maximum amount of time proposed deal StartEpoch can be in future
   #
@@ -210,13 +211,14 @@
   # type: Duration
   # env var: LOTUS_DEALMAKING_PUBLISHMSGPERIOD
   #PublishMsgPeriod = "1h0m0s"
+  PublishMsgPeriod = "0h15m0s"
 
   # The maximum number of deals to include in a single PublishStorageDeals
   # message
   #
   # type: uint64
   # env var: LOTUS_DEALMAKING_MAXDEALSPERPUBLISHMSG
-  MaxDealsPerPublishMsg = 1
+  MaxDealsPerPublishMsg = 8
 
   # The maximum collateral that the provider will put up against a deal,
   # as a multiplier of the minimum collateral bound

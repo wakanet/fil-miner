@@ -7,10 +7,7 @@ netname="boot1"
 #127.0.0.1 boot1.etcd.local
 #127.0.0.1 boot2.etcd.local
 
-netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one eth card.
-if [ -z $netip ]; then
-    netip="127.0.0.1"
-fi
+netip="`/bin/sh ./ip.sh`"
 
 ../../bin/etcd --name $netname --initial-advertise-peer-urls http://$netip:2180 \
   --data-dir=/data/zfs/etcd/${netname}.etcd \

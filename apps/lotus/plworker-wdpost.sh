@@ -66,10 +66,7 @@ fi
 mkdir -p $worker_repo
 mkdir -p $miner_repo
 
-netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one eth card.
-if [ -z $netip ]; then
-    netip="127.0.0.1"
-fi
+netip="`/bin/sh ./ip.sh`"
 if [ -z "$MINER_API_INFO" ]; then
     export MINER_API_INFO="$(cat $miner_repo/token):$(cat $miner_repo/api)"
 fi

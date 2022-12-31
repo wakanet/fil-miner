@@ -75,10 +75,7 @@ mkdir -p $worker_repo
 mkdir -p $miner_repo
 mkdir -p $storage_repo
 
-netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one eth card.
-if [ -z $netip ]; then
-    netip="127.0.0.1"
-fi
+netip="`/bin/sh ./ip.sh`"
 cpu_bind=$(./lotus-worker pledge --cpu-bind)
 cpu_num=$(./lotus-worker pledge --cpu-num)
 export LOTUS_P2_L3_NUM=2

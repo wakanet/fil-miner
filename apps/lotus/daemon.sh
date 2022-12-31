@@ -15,13 +15,11 @@ if [ -z "$repodir" ]; then
 fi
 mkdir -p $repodir
 
+netip="`/bin/sh ./ip.sh`"
 if [ ! -f $repodir/config.toml ]; then
-    netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one eth card.
     echo "Set $netip to config.toml"
     cp config-lotus.toml $repodir/config.toml
-    if [ ! -z $netip ]; then
-    	sed -i "s/127.0.0.1/$netip/g" $repodir/config.toml
-    fi
+    sed -i "s/127.0.0.1/$netip/g" $repodir/config.toml
 fi
 
 
