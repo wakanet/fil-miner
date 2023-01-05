@@ -76,11 +76,11 @@ mkdir -p $miner_repo
 mkdir -p $storage_repo
 
 netip="`/bin/sh ./ip.sh`"
-cpu_bind=$(./lotus-worker pledge --cpu-bind)
-cpu_num=$(./lotus-worker pledge --cpu-num)
+cpu_bind=$(./lotus-worker pledge --cpu-bind 0)
+cpu_num=$(./lotus-worker pledge --cpu-num 0)
 export LOTUS_P2_L3_NUM=2
 # ssd size = 12TB, cores L3 group 32, core thread x2
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --max-tasks=20 --transfer-buffer=2 --parallel-pledge=14 --parallel-precommit1=14 --parallel-precommit2=2 --parallel-commit=0 &
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --max-tasks=28 --transfer-buffer=2 --parallel-pledge=14 --parallel-precommit1=14 --parallel-precommit2=2 --parallel-commit=0 &
 pid=$!
 taskset -pc $cpu_bind $pid
 

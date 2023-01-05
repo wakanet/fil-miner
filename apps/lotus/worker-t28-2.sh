@@ -30,7 +30,6 @@ fi
 if [ ! -z "$gpu" ]; then
     FIL_PROOFS_USE_GPU_COLUMN_BUILDER=1
     FIL_PROOFS_USE_GPU_TREE_BUILDER=1
-
     #"NVIDIA Quadro RTX 6000:4608, NVIDIA TITAN RTX:4608, NVIDIA Tesla V100:5120, NVIDIA Tesla P100:3584, NVIDIA Tesla T4:2560, NVIDIA Quadro M5000:2048, NVIDIA GeForce RTX 3090:10496, NVIDIA GeForce RTX 3080:8704, NVIDIA GeForce RTX 3070:5888, NVIDIA GeForce RTX 2080 Ti:4352, NVIDIA GeForce RTX 2080 SUPER:3072, NVIDIA GeForce RTX 2080:2944, NVIDIA GeForce RTX 2070 SUPER:2560, NVIDIA GeForce GTX 1080 Ti:3584, NVIDIA GeForce GTX 1080:2560, NVIDIA GeForce GTX 2060:1920, NVIDIA GeForce GTX 1660 Ti:1536, NVIDIA GeForce GTX 1060:1280, NVIDIA GeForce GTX 1650 SUPER:1280, NVIDIA GeForce GTX 1650:896"
     case $gpu in
         *"GeForce RTX 3090"):
@@ -80,7 +79,8 @@ netip="`/bin/sh ./ip.sh`"
 cpu_bind=$(./lotus-worker pledge --cpu-bind 0)
 cpu_num=$(./lotus-worker pledge --cpu-num 0)
 export LOTUS_P2_L3_NUM=2
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --max-tasks=12 --parallel-pledge=6 --parallel-precommit1=6 --parallel-precommit2=1 --parallel-commit=1 &
+# ssd size = 24TB, cores L3 group 32, core thread x2
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --max-tasks=56 --transfer-buffer=28 --parallel-pledge=28 --parallel-precommit1=28 --parallel-precommit2=2 --parallel-commit=0 &
 pid=$!
 taskset -pc $cpu_bind $pid
 
