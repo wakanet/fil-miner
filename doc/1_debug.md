@@ -299,8 +299,7 @@ filc start lotus-worker-wnpost # 启动进程级wnpost工人
 cd ~/fil-miner
 . env.sh
 cd script/lotus
-cp ~/lotus/scripts/t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy.dat .
-./lotus.sh wallet import t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy.dat
+./lotus.sh wallet import t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy-dev.dat
 ./lotus.sh wallet new # 创建公证人地址
 sudo lotus send [公证人地址] 10
 ./shed.sh verifreg add-verifier t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy [公证人地址] 1024000 # 添加公证人
