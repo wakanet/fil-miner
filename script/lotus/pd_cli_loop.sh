@@ -60,7 +60,7 @@ do
             call_sleep
             continue
     fi
-    echo "disk-left:"$diskUsed
+    echo "disk-used:"$diskUsed
 
     echo "make propose"
     echo $(date --rfc-3339=ns)
