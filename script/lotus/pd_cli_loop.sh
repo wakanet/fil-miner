@@ -55,7 +55,7 @@ do
     fi
     echo "ap-cur:"$apLimit
 
-    if [ $diskUsed -gt 90 ]; then
+    if [ $diskUsed -gt 95 ]; then
             echo "count worker idle failed, idle:$idle,limit:$apLimit,disk:$diskUsed"
             call_sleep
             continue
@@ -107,3 +107,4 @@ do
 
     call_sleep
 done
+
