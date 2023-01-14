@@ -47,13 +47,13 @@ echo $(df /data/cache/.lotus --output=pcent|sed '1d'|sed 's/%//g'|awk '{printf $
 # 处理：排查worker机器是否全部在正常工作(lotus-miner fstar-worker stat-seal-time)
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-seal
 
-# 可选，检查worker余额情况, 小于30FIL时应告警
+# 可选，检查worker余额情况, 小于30.0FIL时应告警, 10分钟检查一次
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-balance worker
-# 可选，检查owner余额情况, 小于30FIL时应告警
+# 可选，检查owner余额情况, 小于30.0FIL时应告警, 10分钟检查一次
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-balance owner
-# 可选，检查market余额情况, 小于1FIL时应告警
+# 可选，检查market余额情况, 小于1.0FIL时应告警, 10分钟检查一次
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-balance market
-# 可选，检查wdpost余额情况, 小于1FIL时应告警
+# 可选，检查wdpost余额情况, 小于1.0FIL时应告警, 10分钟检查一次
 /root/fil-miner/apps/lotus/lotus-health --repo=/data/cache/.lotus --miner-repo=/data/sdb/lotus-user-1/.lotusminer miner-balance control-0
 
 ```
