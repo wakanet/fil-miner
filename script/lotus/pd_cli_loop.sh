@@ -6,6 +6,7 @@
 lotus_repo="/data/sdb/lotus-user-1/.lotus-proxy"
 miner_repo="/data/sdb/lotus-user-1/.lotusminer"
 
+client_addr="f1csetl7nor3qie2cehx7axf2ai3nedmowj53xwsa"
 server_url="http://10.72.88.63:10022"
 miner_p2p="/ip4/10.72.88.71/tcp/12358"
 ak_id="580ebae7-bbbe-4a05-a015-0efd3605d246"
@@ -28,81 +29,65 @@ do
     idle=$(./miner.sh fstar-worker producer-idle)
     isIdle=$(echo "$idle"|sed -n "/^[0-9][0-9]*$/p")
     apLimit=$(./miner.sh pledge-sector get-limit-ap-cur)
-    isAPLimit=$(echo "$apLimit"|sed -n "/^[0-9][0-9]*$/p")
     diskUsed=$(df /data --output=pcent|sed '1d'|sed 's/%//g'|awk '{printf $1}')
 
     if [ -z "$isIdle" ];then
-            echo "count worker idle failed, idle:$idle,limit:$apLimit,disk:$diskUsed"
+            echo "idle failed, idle:$idle,limit:$apLimit,disk:$diskUsed"
 	    call_sleep
             continue
     fi
-    if [ -z "$isAPLimit" ]; then
-            echo "count worker idle failed, idle:$idle,limit:$apLimit,disk:$diskUsed"
+    if [ $idle -lt 1 ]; then
+            echo "no idle, idle:$idle,limit:$apLimit,disk:$diskUsed"
 	    call_sleep
             continue
     fi
-    idleLimit=$(expr $idle - $apLimit)
-    if [ $idleLimit -lt 0 ]; then
-            echo "count worker idle failed, idle:$idle,limit:$apLimit,disk:$diskUsed"
-	    call_sleep
-            continue
-    fi
-    echo "idle:"$idle
-    if [ $apLimit -gt 80 ]; then
-            echo "count worker idle failed, idle:$idle,limit:$apLimit,disk:$diskUsed"
+    if [ $diskUsed -gt 97 ]; then
+            echo "disk failed, idle:$idle,limit:$apLimit,disk:$diskUsed"
             call_sleep
             continue
     fi
-    echo "ap-cur:"$apLimit
 
-    if [ $diskUsed -gt 95 ]; then
-            echo "count worker idle failed, idle:$idle,limit:$apLimit,disk:$diskUsed"
-            call_sleep
-            continue
-    fi
-    echo "disk-used:"$diskUsed
-
-    echo "make propose"
+    echo "make propose, idle:$idle,limit:$apLimit,disk:$diskUsed"
     echo $(date --rfc-3339=ns)
     propose_out=$(../../bin/pd-cli propose --format json --market-scheduler-url $server_url --miner-multi-addr $miner_p2p --repo=$lotus_repo --ak-id=$ak_id --aks=$aks manual $miner)
-    cid=$(echo $propose_out|/usr/bin/jq .ProposalCid|sed 's/\"//g')
+    propCid=$(echo $propose_out|/usr/bin/jq .ProposalCid|sed 's/\"//g')
+    rootCid=$(echo $propose_out|/usr/bin/jq .RootCid|sed 's/\"//g')
+    pieceCid=$(echo $propose_out|/usr/bin/jq .PieceCid|sed 's/\"//g')
+    pieceSize=$(echo $propose_out|/usr/bin/jq .PieceSize|sed 's/\"//g')
     remoteUrl=$(echo $propose_out|/usr/bin/jq .RemoteUrl|sed 's/\"//g')
-    if [ -z "$cid" ]; then
+    if [ -z "$propCid" ]; then
       echo "cid not found: $propose_out"
       call_sleep
       continue
     fi
     
-    echo $(date --rfc-3339=ns)
-
     echo "fetch car:"$propose_out
-    output="$cache_dir/$cid.car"
-    ../../bin/pd-cli fetch $cid $remoteUrl $output
+    echo $(date --rfc-3339=ns)
+    output=$(./miner.sh fstar-market new-fstmp --really-do-it)
+    ../../bin/pd-cli fetch $propCid $remoteUrl $output
     if [ $? -ne 0 ]; then
       echo "fetch failed: $propose_out"
       exit
     fi
-    
-    echo $(date --rfc-3339=ns)
 
-    echo "import-data:"$cid" "$output
-    ../../apps/lotus/lotus-miner --repo=$lotus_repo --miner-repo=$miner_repo storage-deals import-data $cid $output
+    ./miner.sh fstar-market record-deal $propCid $rootCid $pieceCid $pieceSize $client_addr $output
+    
+    echo "import-data:"$propCid" "$output
+    echo $(date --rfc-3339=ns)
+    ../../apps/lotus/lotus-miner --repo=$lotus_repo --miner-repo=$miner_repo storage-deals import-data $propCid $output
     if [ $? -ne 0 ]; then
       echo "import failed: $propose_out"
       exit
     fi
 
+    echo "confirm:"$propCid" "$remoteUrl
     echo $(date --rfc-3339=ns)
-
-    echo "confirm:"$cid" "$remoteUrl
-    ../../bin/pd-cli confirm $cid $remoteUrl
+    ../../bin/pd-cli confirm $propCid $remoteUrl
     if [ $? -ne 0 ]; then
       echo "confirm failed: $propose_out"
       exit
     fi
 
-    echo "clean local:"$output
-    rm $output
     echo "end"
 
     call_sleep
