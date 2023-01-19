@@ -29,6 +29,7 @@ do
     idle=$(./miner.sh fstar-worker producer-idle)
     isIdle=$(echo "$idle"|sed -n "/^[0-9][0-9]*$/p")
     apLimit=$(./miner.sh pledge-sector get-limit-ap-cur)
+    isAPLimit=$(echo "$apLimit"|sed -n "/^[0-9][0-9]*$/p")
     diskUsed=$(df /data --output=pcent|sed '1d'|sed 's/%//g'|awk '{printf $1}')
 
     if [ -z "$isIdle" ];then
@@ -43,6 +44,17 @@ do
     fi
     if [ $diskUsed -gt 97 ]; then
             echo "disk failed, idle:$idle,limit:$apLimit,disk:$diskUsed"
+            call_sleep
+            continue
+    fi
+    if [ -z "$isAPLimit" ];then
+            echo "ap limit not a number, idle:$idle,limit:$apLimit,disk:$diskUsed"
+	    call_sleep
+            continue
+    fi
+    idleLimit=$(expr $idle - $apLimit)
+    if [ $idleLimit -lt 0 ]; then
+            echo "apLimit more then the idles, idle:$idle,limit:$apLimit,disk:$diskUsed"
             call_sleep
             continue
     fi
@@ -70,6 +82,8 @@ do
       exit
     fi
 
+    echo "record-deal:"$propCid" "$output
+    echo $(date --rfc-3339=ns)
     ./miner.sh fstar-market record-deal $propCid $rootCid $pieceCid $pieceSize $client_addr $output
     
     echo "import-data:"$propCid" "$output
@@ -92,4 +106,3 @@ do
 
     call_sleep
 done
-
