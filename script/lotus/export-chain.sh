@@ -38,7 +38,7 @@ echo "export lotus_chain_snapshot.car done"
 # filc stop lotus-daemon-1 # 停止原服务
 # filc status # 确认链已停止
 # mv /data/cache/.lotus/datastore /data/cache/.lotus/datastore.bak # 备份原链数据
-# ./lotus.sh daemon --import-snapshot ./lotus_chain_20220705.car --halt-after-import # 导入快照
+# ./lotus.sh daemon --import-snapshot /data/download/lotus_chain_snapshot.car --halt-after-import # 导入快照
 # filc start lotus-daemon-1 # 启动链
 # filc status # 确认链已启动
 # ./lotus.sh sync status #  确认链同步成功
