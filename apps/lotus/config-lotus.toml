@@ -25,10 +25,10 @@ ListenAddresses = ["/ip4/0.0.0.0/tcp/12340", "/ip6/::/tcp/12340"]
 #
 [Client]
 #  UseIpfs = false
-UseIpfs = true
+#UseIpfs = true
 #  IpfsOnlineMode = false
 #  IpfsMAddr = ""
-IpfsMAddr = "/ip4/127.0.0.1/tcp/15001"
+#IpfsMAddr = "/ip4/127.0.0.1/tcp/15001"
 #  IpfsUseForRetrieval = false
 #  SimultaneousTransfers = 20
 #
