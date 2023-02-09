@@ -23,7 +23,7 @@ if [ -z "$input_file" ]; then
 fi
 
 #./miner.sh storage-deals set-ask --price 0.0000000 --verified-price 0.0000000 --min-piece-size 1B --max-piece-size 2KiB
-files=$(cat /tmp/files.txt)
+files=$(cat $input_file)
 for f in $files
 do
     echo "make propose"
@@ -40,7 +40,7 @@ do
     fi
 
 	output=$(./miner.sh fstar-market new-fstmp --really-do-it)
-    mv $filePath $output
+    sudo mv $filePath $output
     if [ $? -ne 0 ]; then
       echo "rename failed: $propose_out"
       exit
