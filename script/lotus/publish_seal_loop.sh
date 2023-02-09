@@ -8,7 +8,7 @@ do
   ./miner.sh storage-deals pending-publish --publish-now
   ./miner.sh sectors batching precommit --publish-now
   ./miner.sh sectors batching commit --publish-now
-  echo "sleep 600"
+  echo "sleep 600 or ctrl+c exit"
   sleep 600
   mpoolCur=$(./health.sh chain-mpool)
   if [ $mpoolCur -gt 2 ]; then
