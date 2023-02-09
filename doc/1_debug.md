@@ -302,16 +302,16 @@ cd script/lotus
 ./lotus.sh wallet import t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy-dev.dat
 ./lotus.sh wallet new # 创建公证人地址
 sudo lotus send [公证人地址] 10
-./shed.sh verifreg add-verifier t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy [公证人地址] 1024000 # 添加公证人
+./shed.sh verifreg add-verifier t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy [公证人地址] 1024000 # 添加公证人或者./verifreg.sh [公证人地址]
 ./lotus.sh wallet new # 创建一个有效数据客户端地址
 sudo lotus send [客户端地址] 10000 # 从水龙头处获得点钱
-./lotus.sh filplus grant-datacap --from [公证人地址] [客户端地址] 10240
+./lotus.sh filplus grant-datacap --from [公证人地址] [客户端地址] 10240 # 或者./filplus-grant [公证人地址] [客户端地址]
 ```
 
 ## 启动有效数据密封(stateless)
 ```
 # 设置离线传输询价
-./miner.sh storage-deals set-ask --price 0.0000000 --verified-price 0.0000000 --min-piece-size 256B --max-piece-size 2KiB
+./miner.sh storage-deals set-ask --price 0.0000000 --verified-price 0.0000000 --min-piece-size 1B --max-piece-size 2KiB
 
 # 专用离线版本
 echo "$HOME/fil-miner/script/lotus/lotus.sh" >> /tmp/files.txt
