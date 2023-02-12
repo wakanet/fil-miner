@@ -29,7 +29,7 @@ MaxSealingSectorsForDeals = 0 # 不启用官方配置
 MaxDealsPerSector = 1 
 
 # 若订单数长时间填不满一个扇区，超时后自动打包，不打开此配置默认为1小时
-#  WaitDealsDelay = "1h0m0s"
+#  WaitDealsDelay = "0h15m0s"
 ```
 
 向网络公开libp2p位置

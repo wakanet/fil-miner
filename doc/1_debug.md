@@ -16,8 +16,8 @@
 - [启动密封工人](#启动密封工人)
 - [启动wdpost工人](#启动wdpost工人)
 - [启动wnpost工人](#启动wnpost工人)
-- [启动有效数据密封(stateless)](#启动有效数据密封(stateless))
 - [启动CC密封](#启动CC密封)
+- [启动DC密封](#启动DC密封)
 
 ## 硬件要求
 2k环境
@@ -43,6 +43,7 @@ sudo aptitude install nvidia-driver-510-server
 # 安装依赖(不需安装显卡驱动)
 sudo aptitude install rsync make mesa-opencl-icd ocl-icd-opencl-dev gcc bzr jq pkg-config curl clang build-essential libhwloc-dev
 sudo aptitude install chrony # 时间同步服务，按需
+sudo aptitude install nfs-server nfs-client # 启用NFS作为存储
 ```
 
 32GB及以下环境
@@ -214,27 +215,21 @@ filc status # 确认lotus-user-1进程状态是绿的
 
 ## 启动存储
 ```
+# 配置nfs服务器
+mkdir -p /data/zfs/lotus-user-1/staging/deal-staging
+mkdir -p /data/zfs/lotus-user-1/unseal/unsealed
+mkdir -p /data/zfs/lotus-user-1/sealed/sealed
+echo "/data/zfs *(rw,sync,insecure,no_root_squash)">>/etc/exports # 可选，若已有，不需再执行
+sudo systemctl reload nfs-server
+
+# 初始化miner中的配置
 cd ~/fil-miner
 . env.sh
-
-cp etc/supd/apps/tpl/lotus-storage-0.ini etc/supd/apps # 准备存储服务器进程
-filc reload
-filc status
-
 cd script/lotus
 . env/miner-1.sh
-filc status # 确认进程中有lotus-storage-0
-filc start lotus-storage-0 # 会自动配置nfs文件，nfs文件将会是只读；写操作需要通过http来操作。
-filc status # 确认lotus-storage-0是绿的
-
-# 以下依赖于lotus-user-1已启动(默认使用bcstorage,NFS请改脚本)
-./init-storage-dev.sh # 此脚本内容是挂载lotus-storage-0的存储，更多存储方式参考开发文档或者./miner.sh fstar-storage --help
-# 查阅miner中的存储节点状态, 此时显示有两个节点存储被miner管理了
+filc status
+./init-storage-dev.sh # 详见脚本内容，会启用staging、unseal、sealed三个存储
 ./miner.sh fstar-storage status --debug 
-
-# 因miner会接管理lotus-storage-0的密钥信息，当重建miner时，需要重置lotus-sotrage-0的服务器配置文件
-rm -r ~/fil-miner/var/lotus-storage-0
-filc restart lotus-storage-0 # 删除配置文件后重启lotus-storage-0服务
 ```
 
 ## 启动密封工人
@@ -294,7 +289,19 @@ filc status # 确认进程中有lotus-worker-wnpost
 filc start lotus-worker-wnpost # 启动进程级wnpost工人
 ```
 
-## 签名有效数据
+## 启动CC密封
+```
+cd ~/fil-miner
+. env.sh
+
+cd script/lotus
+. env/miner-1.sh
+./miner.sh pledge-sector start # 自动发送CC pledge指令
+# ./miner.sh pledge-sector stop # 停止发送CC pledge指令
+```
+
+## 启动DC密封
+### 签名有效数据
 ```
 cd ~/fil-miner
 . env.sh
@@ -308,26 +315,30 @@ sudo lotus send [客户端地址] 10000 # 从水龙头处获得点钱
 ./lotus.sh filplus grant-datacap --from [公证人地址] [客户端地址] 10240 # 或者./filplus-grant [公证人地址] [客户端地址]
 ```
 
-## 启动有效数据密封(stateless)
+### 选择DC的缓存存储
+方案一，默认miner模式
+```
+# 不需要做什么
+```
+方案二，启用NFS存储模式，此模式注意数据流网卡走向
+```
+sudo mv /data/sdb/lotus-user-1/.lotusminer/deal-staging /data/sdb/lotus-user-1/.lotusminer/deal-staging.bak
+sudo ln -s /data/nfs/lotus-user-1/1/staging/deal-staging /data/sdb/lotus-user-1/.lotusminer/deal-staging
+```
+
+### 发送DC密封
 ```
 # 设置离线传输询价
-./miner.sh storage-deals set-ask --price 0.0000000 --verified-price 0.0000000 --min-piece-size 1B --max-piece-size 2KiB
+./miner.sh storage-deals set-ask --price 0.0000000 --verified-price 0.0000000 --max-piece-size 2KiB
 
 # 专用离线版本
 echo "$HOME/fil-miner/script/lotus/lotus.sh" >> /tmp/files.txt
-echo "$HOME/fil-miner/script/lotus/miner.sh" >> /tmp/files.txt
-./miner.sh storage-deals offline-make --from [有效数据地址] /tmp/files.txt # 
-```
 
-## 启动CC密封
-```
-cd ~/fil-miner
-. env.sh
+# 使用方案一miner存储
+./miner.sh storage-deals offline-make --from [有效数据地址] /tmp/files.txt 
 
-cd script/lotus
-. env/miner-1.sh
-./miner.sh pledge-sector start # 自动发送CC pledge指令
-# ./miner.sh pledge-sector stop # 停止发送CC pledge指令
+# 使用方案二nfs存储, 需要填写指定的fstar-storage的kind=2的存储
+./miner.sh storage-deals offline-make --storage-id=[1] --from [有效数据地址] /tmp/files.txt 
 ```
 
 ***备注:***
