@@ -56,6 +56,7 @@ do
     
     echo "import-data:"$propCid" "$output
     echo $(date --rfc-3339=ns)
+    #./miner.sh storage-deals import-data --storage-id=3 $propCid $output
     ./miner.sh storage-deals import-data $propCid $output
     if [ $? -ne 0 ]; then
       echo "import failed: $propose_out"
@@ -65,4 +66,4 @@ do
 done
 
 ./miner.sh storage-deals pending-publish --publish-now
-ls -lt /data/sdb/lotus-user-1/.lotusminer/deal-staging
+ls -lt /data/sdb/lotus-user-1/.lotusminer/deal-staging/
