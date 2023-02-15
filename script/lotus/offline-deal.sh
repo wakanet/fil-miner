@@ -2,8 +2,13 @@
 
 client_addr=$1
 input_file=$2
+storage_id=$3
 cache_dir="/data/cache/dc-tmp"
 sleep_sec=10
+
+if [ -z "$storage_id" ]; then
+    storage_id=0
+fi
 
 mkdir -p $cache_dir
 
@@ -13,12 +18,12 @@ call_sleep(){
 }
 
 if [ -z "$client_addr" ]; then
-    echo "client address not set, expect [client addr] [file source]"
+    echo "client address not set, expect [client addr] [file source] [<storage_id>]"
     exit
 fi
 
 if [ -z "$input_file" ]; then
-    echo "input file not set, expect [client addr] [file source]"
+    echo "input file not set, expect [client addr] [file source] [<storage_id>]"
     exit
 fi
 
@@ -56,8 +61,7 @@ do
     
     echo "import-data:"$propCid" "$output
     echo $(date --rfc-3339=ns)
-    #./miner.sh storage-deals import-data --storage-id=3 $propCid $output
-    ./miner.sh storage-deals import-data $propCid $output
+    ./miner.sh storage-deals import-data --storage-id=$storage_id $propCid $output
     if [ $? -ne 0 ]; then
       echo "import failed: $propose_out"
       exit
