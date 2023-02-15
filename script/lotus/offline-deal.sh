@@ -22,7 +22,7 @@ if [ -z "$input_file" ]; then
     exit
 fi
 
-#./miner.sh storage-deals set-ask --price 0.0000000 --verified-price 0.0000000 --min-piece-size 1B --max-piece-size 2KiB
+#./miner.sh storage-deals set-ask --price 0.0000000 --verified-price 0.0000000 --max-piece-size 2KiB
 files=$(cat $input_file)
 for f in $files
 do
