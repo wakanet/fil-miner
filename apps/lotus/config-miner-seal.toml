@@ -262,6 +262,7 @@
   # type: uint64
   # env var: LOTUS_DEALMAKING_STARTEPOCHSEALINGBUFFER
   #StartEpochSealingBuffer = 480
+  StartEpochSealingBuffer = 1440 # 12hours when epoch is 30s
 
   # A command used for fine-grained evaluation of storage deals
   # see https://lotus.filecoin.io/storage-providers/advanced-configurations/market/#using-filters-for-fine-grained-storage-and-retrieval-deal-acceptance for more details
@@ -467,7 +468,7 @@ MaxWaitDealsSectors = 0
 MaxSealingSectors = 0
 MaxSealingSectorsForDeals = 0
 MaxDealsPerSector = 1
-WaitDealsDelay = "1h0m0s"
+WaitDealsDelay = "12h0m0s"
 #  AlwaysKeepUnsealedCopy = true
 #  FinalizeEarly = false
   BatchPreCommits = true
