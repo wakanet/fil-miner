@@ -79,6 +79,7 @@ RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip \
     --no-local-storage=true \
     --no-swap=true \
     --listen=$netip:3455 \
+    --prove-replica-update2=false \
     --commit=false &
 pid=$!
 

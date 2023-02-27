@@ -85,7 +85,7 @@ RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip \
     --precommit2=false \
     --commit=true \
     --replica-update=false \
-    --prove-replica-update2=false \
+    --prove-replica-update2=true \
     --regen-sector-key=false &
 pid=$!
 
