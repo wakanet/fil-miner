@@ -1,5 +1,11 @@
 #!/bin/sh
 
+mode=$1
+if [ -z "$mode" ]; then
+    echo "need input argument 'custom' or 'nfs' or 'fstar'"
+    exit
+fi
+
 # about nfs option
 # http://blog.sina.com.cn/s/blog_605f5b4f0102uwy7.html
 # https://qastack.cn/unix/31979/stop-broken-nfs-mounts-from-locking-a-directory
@@ -45,34 +51,59 @@ fi
 ## add staging storage, kind for custom, nfs, fstar-storage
 ## need make a ln -s $MINER_REPO/staging/deal-staging $MOUNT_PATH/deal-staging
 ##========================================================##
-#./miner.sh fstar-storage add --kind=2 --mount-type="custom" --mount-dir="/data/nfs" --mount-signal-uri="-" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100000
+case $mode in
+    "custom")
+    ./miner.sh fstar-storage add --kind=2 --mount-type="custom" --mount-dir="/data/nfs/lotus-user-1" --mount-signal-uri="custom" --max-size=112589990684262400 --sector-size=35433480192 --max-work=100000
+    echo "need ln -s [the storage] /data/nfs/lotus-user-1/[storage-id]"
+    ;;
 
-./miner.sh fstar-storage add --kind=2 --mount-type="nfs" --mount-opt="-o vers=3,rw,nolock,intr,proto=tcp,rsize=1048576,wsize=1048576,hard,timeo=7,retrans=10,actimeo=10,retry=5" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/staging" --mount-transf-uri="$netip:/data/zfs/lotus-user-1/staging" --mount-dir="/data/nfs/lotus-user-1" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100
+    "nfs")
+    ./miner.sh fstar-storage add --kind=2 --mount-type="nfs" --mount-opt="-o vers=3,rw,nolock,intr,proto=tcp,rsize=1048576,wsize=1048576,hard,timeo=7,retrans=10,actimeo=10,retry=5" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/staging" --mount-transf-uri="$netip:/data/zfs/lotus-user-1/staging" --mount-dir="/data/nfs/lotus-user-1" --max-size=112589990684262400 --sector-size=35433480192 --max-work=100
+    ;;
 
-#./miner.sh fstar-storage add --kind=2 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/staging" --mount-transf-uri="$netip:1331" --mount-dir="/data/nfs/lotus-user-1" --mount-auth-uri="$netip:1330" --max-size=-1 --sector-size=35433480192 --max-work=100 --mount-auth=$unsealAuth
-
+    "fstar")
+    ./miner.sh fstar-storage add --kind=2 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/staging" --mount-transf-uri="$netip:1331" --mount-dir="/data/nfs/lotus-user-1" --mount-auth-uri="$netip:1330" --max-size=-1 --sector-size=35433480192 --max-work=100 --mount-auth=$unsealAuth
+esac
 
 ## add unsealed storage, kind for custom, nfs, fstar-storage
 ##========================================================##
-#./miner.sh fstar-storage add --kind=1 --mount-type="custom" --mount-dir="/data/nfs" --mount-signal-uri="-" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100000
+case $mode in
+    "custom")
+    ./miner.sh fstar-storage add --kind=1 --mount-type="custom" --mount-dir="/data/nfs/lotus-user-1" --mount-signal-uri="custom" --max-size=112589990684262400 --sector-size=35433480192 --max-work=100000
+    echo "need ln -s [the storage] /data/nfs/lotus-user-1/[storage-id]"
+    ;;
 
-./miner.sh fstar-storage add --kind=1 --mount-type="nfs" --mount-opt="-o vers=3,rw,nolock,intr,proto=tcp,rsize=1048576,wsize=1048576,hard,timeo=7,retrans=10,actimeo=10,retry=5" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/unseal" --mount-transf-uri="$netip:/data/zfs/lotus-user-1/unseal" --mount-dir="/data/nfs/lotus-user-1" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100
+    "nfs")
+    ./miner.sh fstar-storage add --kind=1 --mount-type="nfs" --mount-opt="-o vers=3,rw,nolock,intr,proto=tcp,rsize=1048576,wsize=1048576,hard,timeo=7,retrans=10,actimeo=10,retry=5" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/unseal" --mount-transf-uri="$netip:/data/zfs/lotus-user-1/unseal" --mount-dir="/data/nfs/lotus-user-1" --max-size=112589990684262400 --sector-size=35433480192 --max-work=100
+    ;;
 
-#./miner.sh fstar-storage add --kind=1 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/unseal" --mount-transf-uri="$netip:1331" --mount-dir="/data/nfs/lotus-user-1" --mount-auth-uri="$netip:1330" --max-size=-1 --sector-size=35433480192 --max-work=100 --mount-auth=$unsealAuth
+    "fstar")
+    ./miner.sh fstar-storage add --kind=1 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/unseal" --mount-transf-uri="$netip:1331" --mount-dir="/data/nfs/lotus-user-1" --mount-auth-uri="$netip:1330" --max-size=-1 --sector-size=35433480192 --max-work=100 --mount-auth=$unsealAuth
+    ;;
+esac
 
 ## add sealed storage, kind for custom, nfs, fstar-storage
 ##========================================================##
 # 1PB capacity
-#./miner.sh fstar-storage add --kind=0 --mount-type="custom" --mount-dir="/data/nfs" --mount-signal-uri="-" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100000
+case $mode in
+    "custom")
+    ./miner.sh fstar-storage add --kind=0 --mount-type="custom" --mount-dir="/data/nfs/lotus-user-1" --mount-signal-uri="custom" --max-size=112589990684262400 --sector-size=35433480192 --max-work=100000
+    echo "need ln -s [the storage] /data/nfs/lotus-user-1/[storage-id]"
+    ;;
 
-./miner.sh fstar-storage add --kind=0 --mount-type="nfs" --mount-opt="-o vers=3,rw,nolock,intr,proto=tcp,rsize=1048576,wsize=1048576,hard,timeo=7,retrans=10,actimeo=10,retry=5" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/sealed" --mount-transf-uri="$netip:/data/zfs/lotus-user-1/sealed" --mount-dir="/data/nfs/lotus-user-1" --max-size=1125899906842624 --sector-size=35433480192 --max-work=100
+    "nfs")
+    ./miner.sh fstar-storage add --kind=0 --mount-type="nfs" --mount-opt="-o vers=3,rw,nolock,intr,proto=tcp,rsize=1048576,wsize=1048576,hard,timeo=7,retrans=10,actimeo=10,retry=5" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/sealed" --mount-transf-uri="$netip:/data/zfs/lotus-user-1/sealed" --mount-dir="/data/nfs/lotus-user-1" --max-size=112589990684262400 --sector-size=35433480192 --max-work=100
+    ;;
 
 ## lotus-storage-0
-#./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/sealed" --mount-transf-uri="$netip:1331" --mount-dir="/data/nfs/lotus-user-1" --mount-auth-uri="$netip:1330" --max-size=-1 --sector-size=35433480192 --max-work=100 --mount-auth=$sealedAuth
-## lotus-storage-1 
-#./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs1" --mount-transf-uri="$netip:1341" --mount-dir="/data/nfs" --mount-auth-uri="$netip:1340" --max-size=354334801920 --sector-size=35433480192 --max-work=100 # for lotus-storage-1
-## lotus-storage-2
-#./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs2" --mount-transf-uri="$netip:1351" --mount-dir="/data/nfs" --mount-auth-uri="$netip:1350" --max-size=354334801920 --sector-size=35433480192 --max-work=100 # fro lotus-storage-2
+    "fstar")
+    ./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs/lotus-user-1/sealed" --mount-transf-uri="$netip:1331" --mount-dir="/data/nfs/lotus-user-1" --mount-auth-uri="$netip:1330" --max-size=-1 --sector-size=35433480192 --max-work=100 --mount-auth=$sealedAuth
+    ## lotus-storage-1 
+    #./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs1" --mount-transf-uri="$netip:1341" --mount-dir="/data/nfs" --mount-auth-uri="$netip:1340" --max-size=354334801920 --sector-size=35433480192 --max-work=100 # for lotus-storage-1
+    ## lotus-storage-2
+    #./miner.sh fstar-storage add --kind=0 --mount-type="fstar-storage" --mount-signal-uri="$netip:/data/zfs2" --mount-transf-uri="$netip:1351" --mount-dir="/data/nfs" --mount-auth-uri="$netip:1350" --max-size=354334801920 --sector-size=35433480192 --max-work=100 # fro lotus-storage-2
+    ;;
+esac
 
-./miner.sh fstar-storage scale --storage-id=1 --max-size=1125899906842624
-./miner.sh fstar-storage scale --storage-id=2 --max-size=1125899906842624
+#./miner.sh fstar-storage scale --storage-id=1 --max-size=1125899906842624
+#./miner.sh fstar-storage scale --storage-id=2 --max-size=1125899906842624

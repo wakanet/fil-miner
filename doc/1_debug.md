@@ -228,7 +228,7 @@ cd ~/fil-miner
 cd script/lotus
 . env/miner-1.sh
 filc status
-./init-storage-dev.sh # 详见脚本内容，会启用staging、unseal、sealed三个存储
+./init-storage-dev.sh nfs # 详见脚本内容，会启用staging、unseal、sealed三个存储
 ./miner.sh fstar-storage status --debug 
 ```
 

@@ -18,7 +18,7 @@ filc start lotus-storage-0 # 会自动配置nfs文件，nfs文件将会是只读
 filc status # 确认lotus-storage-0是绿的
 
 # 以下依赖于lotus-user-1已启动(默认使用bcstorage,NFS请改脚本)
-./init-storage-dev.sh # 此脚本内容是挂载lotus-storage-0的存储，更多存储方式参考开发文档或者./miner.sh fstar-storage --help
+./init-storage-dev.sh fstar # 此脚本内容是挂载lotus-storage-0的存储，更多存储方式参考开发文档或者./miner.sh fstar-storage --help
 # 查阅miner中的存储节点状态, 此时显示有两个节点存储被miner管理了
 ./miner.sh fstar-storage status --debug 
 
