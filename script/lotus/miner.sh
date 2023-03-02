@@ -17,7 +17,7 @@ if [ $init -eq 1 ];then
     sudo mv $filrepo/config.toml $filrepo/config.toml.bak
     sudo cp $PRJ_ROOT/apps/lotus/config-miner-seal.toml $filrepo/config.toml
     sudo cp $PRJ_ROOT/apps/lotus/config-withdraw.toml $filrepo/withdraw.toml
-    netip=$(ip a | grep -Po '(?<=inet ).*(?=\/)'|grep -E "^10\.") # only support one eth card.
+    netip="`/bin/sh $PRJ_ROOT/bin/ip.sh`"
     if [ ! -z $netip ]; then
         echo "Set $netip to config.toml"
         sudo sed -i "s/127.0.0.1/$netip/g" $filrepo/config.toml

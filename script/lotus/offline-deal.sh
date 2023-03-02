@@ -5,6 +5,7 @@ input_file=$2
 storage_id=$3
 cache_dir="/data/cache/dc-tmp"
 sleep_sec=10
+local_ip="`/bin/sh $PRJ_ROOT/bin/ip.sh`"
 
 if [ -z "$storage_id" ]; then
     storage_id=0
@@ -45,7 +46,23 @@ do
     fi
 
 	output=$(./miner.sh fstar-market new-fstmp --really-do-it)
-    sudo mv $filePath $output
+    filename=$(basename $output)
+    remoteUri="http://$local_ip:2356/deal-staging/$filename"
+    touch $output # make a empty fsmtp
+    #sudo mv $filePath $output # mv to where is need
+    case $storage_id in
+        0)
+            debugPath="/data/sdb/lotus-user-1/.lotusminer/deal-staging"
+        ;;
+        1)
+            debugPath="/data/nfs/lotus-user-1/1/deal-staging"
+        ;;
+        *)
+            debugPath="/data/sdb/lotus-user-2/.lotusminer/deal-staging" # using the pb-storage
+        ;;
+    esac
+    sudo mv $filePath $debugPath/$filename # mv to where is need
+    ls -lat $debugPath
     if [ $? -ne 0 ]; then
       echo "rename failed: $propose_out"
       exit
@@ -53,7 +70,7 @@ do
 
     echo "record-deal:"$propCid" "$output
     echo $(date --rfc-3339=ns)
-    ./miner.sh fstar-market record-deal $propCid $rootCid $pieceCid $pieceSize $client_addr $output $storage_id
+    ./miner.sh fstar-market record-deal $propCid $rootCid $pieceCid $pieceSize $client_addr $output $remoteUri $storage_id
     if [ $? -ne 0 ]; then
       echo "record failed: $propose_out"
       exit
@@ -61,7 +78,7 @@ do
     
     echo "import-data:"$propCid" "$output
     echo $(date --rfc-3339=ns)
-    ./miner.sh storage-deals import-data --storage-id=$storage_id $propCid $output
+    ./miner.sh storage-deals import-data --storage-id=$storage_id $propCid $output $remoteUri
     if [ $? -ne 0 ]; then
       echo "import failed: $propose_out"
       exit

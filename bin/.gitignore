@@ -2,3 +2,5 @@
 !/.gitignore
 !/sup
 !/filc
+!/ip.sh
+!/pb-cli
