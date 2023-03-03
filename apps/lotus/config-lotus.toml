@@ -4,6 +4,9 @@ ListenAddress = "/ip4/127.0.0.1/tcp/11234/http"
 #  RemoteListenAddress = ""
 #  Timeout = "30s"
 #
+[ProxyAPI]
+ListenAddress = "/ip4/127.0.0.1/tcp/11334/http"
+#
 [Backup]
 #  DisableMetadataLog = true
 #
