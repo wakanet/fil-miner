@@ -47,7 +47,7 @@ do
 
 	output=$(./miner.sh fstar-market new-fstmp --really-do-it)
     filename=$(basename $output)
-    remoteUri="http://$local_ip:2356/deal-staging/$filename"
+    remoteUri="http://$local_ip:2358/file/deal-staging/$filename"
     touch $output # make a empty fsmtp
     #sudo mv $filePath $output # mv to where is need
     case $storage_id in
