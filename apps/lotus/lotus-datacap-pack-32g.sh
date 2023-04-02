@@ -18,7 +18,7 @@ mkdir -p $src_dir
 mkdir -p $cache_dir
 mkdir -p $tar_dir
 
-./lotus-datacap pack-srv --src-dir=$src_dir --cache-dir=$cache_dir --tar-dir=$tar_dir --tar-random=100 --tar-min-size=17GiB --tar-encrypt=$encrypt_key &
+./lotus-datacap pack-srv --src-dir=$src_dir --cache-dir=$cache_dir --tar-dir=$tar_dir --tar-random=10000 --tar-min-size=17GiB --tar-encrypt=$encrypt_key &
 pid=$!
 
 # set ulimit for process
