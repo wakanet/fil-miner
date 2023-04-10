@@ -4,21 +4,34 @@ src_dir=$1
 if [ -z "$src_dir" ]; then
     src_dir="/data/lotus-datacap/src-dir"
 fi
-cache_dir=$2
-if [ -z "$cache_dir" ]; then
-    cache_dir="/data/lotus-datacap/cache-dir"
+cache_pack=$2
+if [ -z "$cache_pack" ]; then
+    cache_dir="/data/lotus-datacap/cache-pack"
 fi
-tar_dir=$3
+cache_tar=$3
+if [ -z "$cache_tar" ]; then
+    cache_dir="/data/lotus-datacap/cache-tar"
+fi
+tar_dir=$4
 if [ -z "$tar_dir" ]; then
     tar_dir="/data/lotus-datacap/tar-dir"
 fi
-encrypt_key=$4
+encrypt_key_file=$5
 
 mkdir -p $src_dir
-mkdir -p $cache_dir
+mkdir -p $cache_pack
+mkdir -p $cache_tar
 mkdir -p $tar_dir
 
-./lotus-datacap pack-srv --src-dir=$src_dir --cache-dir=$cache_dir --tar-dir=$tar_dir --tar-random=100 --tar-min-size=10B --tar-encrypt=$encrypt_key &
+./lotus-datacap pack-srv \
+	--src-dir=$src_dir \
+	--cache-pack=$cache_pack \
+	--cache-output=$cache_tar \
+	--tar-dir=$tar_dir \
+	--tar-parallel=9 \
+	--tar-random=100 \
+	--tar-min-size=10B \
+	--tar-encrypt-file=$encrypt_key_file &
 pid=$!
 
 # set ulimit for process
