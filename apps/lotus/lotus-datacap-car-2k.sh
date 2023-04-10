@@ -1,24 +1,20 @@
 #!/bin/sh
 
-src_dir=$1
-if [ -z "$src_dir" ]; then
-    src_dir="/data/lotus-datacap/src-dir"
-fi
-cache_dir=$2
-if [ -z "$cache_dir" ]; then
-    cache_dir="/data/lotus-datacap/cache-dir"
-fi
-tar_dir=$3
+tar_dir=$1
 if [ -z "$tar_dir" ]; then
     tar_dir="/data/lotus-datacap/tar-dir"
 fi
-encrypt_key_file=$4
+car_dir=$2
+if [ -z "$car_dir" ]; then
+    car_dir="/data/lotus-datacap/car-dir"
+fi
+dbfile=$3
+if [ -z "$dbfile" ]; then
+    dbfile="/data/lotus-datacap/sqlite.db"
+fi
+remote_url="http://$(./ip.sh):9080"
 
-mkdir -p $src_dir
-mkdir -p $cache_dir
-mkdir -p $tar_dir
-
-./lotus-datacap pack-srv --src-dir=$src_dir --cache-dir=$cache_dir --tar-dir=$tar_dir --tar-parallel=30 --tar-random=10000 --tar-min-size=17GiB --tar-encrypt-file=$encrypt_key_file &
+./lotus-datacap car-srv --tar-dir=$tar_dir --car-dir=$car_dir --gen-parallel=6 --dbfile=$dbfile --remote-url=$remote_url &
 pid=$!
 
 # set ulimit for process
