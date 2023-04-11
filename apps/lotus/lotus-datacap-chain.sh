@@ -5,7 +5,7 @@ if [ ! -d "$repodir" ]; then
    repodir=/data/cache/.lotus
 fi
 
-./lotus-datacap chain-srv --repo=$repodir &
+./lotus-datacap-chain chain-srv --repo=$repodir &
 pid=$!
 
 # set ulimit for process

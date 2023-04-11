@@ -16,6 +16,7 @@ remote_url="http://$(./ip.sh):9080"
 
 ./lotus-datacap car-srv --tar-dir=$tar_dir --car-dir=$car_dir --gen-parallel=30 --dbfile=$dbfile --remote-url=$remote_url &
 pid=$!
+taskset -pc 30-95 $pid
 
 # set ulimit for process
 nropen=$(cat /proc/sys/fs/nr_open)
