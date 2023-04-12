@@ -6,11 +6,11 @@ if [ -z "$src_dir" ]; then
 fi
 cache_pack=$2
 if [ -z "$cache_pack" ]; then
-    cache_dir="/data/lotus-datacap/cache-pack"
+    cache_pack="/data/lotus-datacap/cache-pack"
 fi
 cache_tar=$3
 if [ -z "$cache_tar" ]; then
-    cache_dir="/data/lotus-datacap/cache-tar"
+    cache_tar="/data/lotus-datacap/cache-tar"
 fi
 tar_dir=$4
 if [ -z "$tar_dir" ]; then
@@ -26,7 +26,7 @@ mkdir -p $tar_dir
 ./lotus-datacap pack-srv \
 	--src-dir=$src_dir \
 	--cache-pack=$cache_pack \
-	--cache-output=$cache_tar \
+	--cache-tar=$cache_tar \
 	--tar-dir=$tar_dir \
 	--tar-parallel=9 \
 	--tar-random=100 \
