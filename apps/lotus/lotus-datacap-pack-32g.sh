@@ -4,33 +4,21 @@ src_dir=$1
 if [ -z "$src_dir" ]; then
     src_dir="/data/lotus-datacap/src-dir"
 fi
-cache_pack=$2
-if [ -z "$cache_pack" ]; then
-    cache_pack="/data/lotus-datacap/cache-pack"
-fi
-cache_tar=$3
-if [ -z "$cache_tar" ]; then
-    cache_tar="/data/lotus-datacap/cache-tar"
-fi
-tar_dir=$4
+tar_dir=$2
 if [ -z "$tar_dir" ]; then
     tar_dir="/data/lotus-datacap/tar-dir"
 fi
-encrypt_key_file=$5
+encrypt_key_file=$3
 
 mkdir -p $src_dir
-mkdir -p $cache_pack
-mkdir -p $cache_tar
 mkdir -p $tar_dir
 
 ./lotus-datacap pack-srv \
 	--src-dir=$src_dir \
-	--cache-pack=$cache_pack \
-	--cache-tar=$cache_tar \
 	--tar-dir=$tar_dir \
 	--tar-parallel=6 \
 	--tar-random=10000 \
-	--tar-min-size=16GiB \
+	--tar-min-size=8GiB \
 	--tar-encrypt-file=$encrypt_key_file &
 pid=$!
 taskset -pc 0-29 $pid
