@@ -5,8 +5,12 @@
 
 case $1 in
     "fetch")
-        echo "fetch: $2 $3 $4"
-        curl -o $4 $3
+        propCid=$2
+        fullUri=$3
+        fileName=$4
+        dealStage=$5
+        echo "fetch: $propCid,$fullUri,$fileName,$dealStage"
+        curl -o $fullUri $dealStage
     ;;
     "confirm"):
         echo "confirm: $2 $3"
