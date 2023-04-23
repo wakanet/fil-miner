@@ -54,7 +54,9 @@ fi
 case $mode in
     "custom")
     ./miner.sh fstar-storage add --kind=2 --mount-type="custom" --mount-dir="/data/nfs/lotus-user-1" --mount-signal-uri="custom" --max-size=112589990684262400 --sector-size=35433480192 --max-work=100000
-    echo "success. need ln -s [the storage] /data/nfs/lotus-user-1/[storage-id]"
+    echo "success."
+    echo "for miner, need 'ln -s [the mount point] /data/nfs/lotus-user-1/[storage-id]' by manually"
+    echo "for worker, need 'ln -s [the mount point] /data/lotus-push/[storage-id]' by manually"
     ;;
 
     "nfs")
@@ -74,7 +76,9 @@ esac
 case $mode in
     "custom")
     ./miner.sh fstar-storage add --kind=1 --mount-type="custom" --mount-dir="/data/nfs/lotus-user-1" --mount-signal-uri="custom" --max-size=112589990684262400 --sector-size=35433480192 --max-work=100000
-    echo "success. need ln -s [the storage] /data/nfs/lotus-user-1/[storage-id]"
+    echo "success."
+    echo "for miner, need 'ln -s [the mount point] /data/nfs/lotus-user-1/[storage-id]' by manually"
+    echo "for worker, need 'ln -s [the mount point] /data/lotus-push/[storage-id]' by manually"
     ;;
 
     "nfs")
@@ -92,7 +96,9 @@ esac
 case $mode in
     "custom")
     ./miner.sh fstar-storage add --kind=0 --mount-type="custom" --mount-dir="/data/nfs/lotus-user-1" --mount-signal-uri="custom" --max-size=112589990684262400 --sector-size=35433480192 --max-work=100000
-    echo "success. need ln -s [the storage] /data/nfs/lotus-user-1/[storage-id]"
+    echo "success."
+    echo "for miner, need 'ln -s [the mount point] /data/nfs/lotus-user-1/[storage-id]' by manually"
+    echo "for worker, need 'ln -s [the mount point] /data/lotus-push/[storage-id]' by manually"
     ;;
 
     "nfs")
