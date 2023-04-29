@@ -14,7 +14,12 @@ if [ -z "$dbfile" ]; then
 fi
 remote_url="http://$(./ip.sh):9080"
 
-./lotus-datacap car-srv --tar-dir=$tar_dir --car-dir=$car_dir --gen-parallel=6 --dbfile=$dbfile --remote-url=$remote_url &
+./lotus-datacap car-srv \
+    --tar-dir=$tar_dir \
+    --car-dir=$car_dir \
+    --gen-parallel=30 \
+    --dbfile=$dbfile \
+    --remote-url=$remote_url &
 pid=$!
 
 # set ulimit for process

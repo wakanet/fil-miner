@@ -4,22 +4,24 @@ src_dir=$1
 if [ -z "$src_dir" ]; then
     src_dir="/data/lotus-datacap/src-dir"
 fi
-cache_dir=$2
-if [ -z "$cache_dir" ]; then
-    cache_dir="/data/lotus-datacap/cache-dir"
-fi
-tar_dir=$3
+tar_dir=$2
 if [ -z "$tar_dir" ]; then
     tar_dir="/data/lotus-datacap/tar-dir"
 fi
-encrypt_key=$4
+encrypt_key_file=$3
 
 mkdir -p $src_dir
-mkdir -p $cache_dir
 mkdir -p $tar_dir
 
-./lotus-datacap pack-srv --src-dir=$src_dir --cache-dir=$cache_dir --tar-dir=$tar_dir --tar-random=100 --tar-min-size=32GiB --tar-encrypt=$encrypt_key &
+./lotus-datacap pack-srv \
+	--src-dir=$src_dir \
+	--tar-dir=$tar_dir \
+	--tar-parallel=6 \
+	--tar-random=10000 \
+    --tar-min-size=17GiB \
+	--tar-encrypt-file=$encrypt_key_file &
 pid=$!
+taskset -pc 0-29 $pid
 
 # set ulimit for process
 nropen=$(cat /proc/sys/fs/nr_open)
