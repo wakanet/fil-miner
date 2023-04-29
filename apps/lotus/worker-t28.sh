@@ -80,7 +80,15 @@ cpu_bind=$(./lotus-worker pledge --cpu-bind 0)
 cpu_num=$(./lotus-worker pledge --cpu-num 0)
 export LOTUS_P2_L3_NUM=2
 # ssd size = 24TB, cores L3 group 32, core thread x2
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --max-tasks=40 --transfer-buffer=28 --parallel-pledge=28 --parallel-precommit1=28 --parallel-precommit2=1 --parallel-commit=0 --md5sum=false &
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run \
+    --id-file="$worker_id_file" \
+    --max-tasks=40 \
+    --parallel-pledge=28 \
+    --parallel-unseal=0 \
+    --parallel-precommit1=28 \
+    --parallel-precommit2=1 \
+    --parallel-commit=0 \
+    --md5sum=false &
 pid=$!
 taskset -pc $cpu_bind $pid
 
