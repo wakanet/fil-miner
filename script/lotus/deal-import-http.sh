@@ -99,9 +99,4 @@ do
       echo "import failed: $propose_out"
       continue
     fi
-
-    echo "confirm:"$propCid" "$remoteUrl
-    echo $(date --rfc-3339=ns)
-    curl -d "propCid=$propCid&remoteUrl=$remoteUrl" "$httpServer/deal/confirm"
-    echo "end"
 done
