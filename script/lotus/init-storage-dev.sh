@@ -1,16 +1,15 @@
 #!/bin/sh
 
-mode=$1
-if [ -z "$mode" ]; then
-    echo "need input first argument 'custom' or 'nfs' or 'fstar'" or 'pb-storage' for mode
-    exit
-fi
-kind=$2
+kind=$1
 if [ -z "$kind" ]; then
     echo "need input second argument 'staging' or 'unsealed' or 'sealed'" for kind
     exit
 fi
-
+mode=$2
+if [ -z "$mode" ]; then
+    echo "need input first argument 'custom' or 'nfs' or 'fstar'" or 'pb-storage' for mode
+    exit
+fi
 
 # about nfs option
 # http://blog.sina.com.cn/s/blog_605f5b4f0102uwy7.html
@@ -19,6 +18,20 @@ fi
 # soft,timeo=7,retrans=5,actimeo=10,retry=5 实测为12秒超时
 # soft,timeo=7,retrans=10,actimeo=10 实测为18秒超时
 # soft,timeo=7,retrans=15,actimeo=10 实测有的5分钟超时
+### 配置/etc/exports(可选)
+#lotus-storage会自动配置此值，但若已配置过时，lotus-storage不会再配置，因此若手工配置过，仍需手工配置
+#
+#只读手工配置如下, 默认启动lotus-storage后会自动配置
+#```
+#/data/zfs *(ro,sync,insecure,no_root_squash)
+##/data/zfs1 *(ro,sync,insecure,no_root_squash)
+##/data/zfs2 *(ro,sync,insecure,no_root_squash)
+#```
+#
+#可写配置如下，注意可写时无有效的安全删除防护, 启用lotus-storage后已不再使用以下nfs配置
+#```
+#/data/zfs *(rw,sync,insecure,no_root_squash)
+#```
 
 # 1GB: 1073741824
 # 32GB: 34359738368
