@@ -52,7 +52,7 @@ sudo aptitude install nfs-client # 按需安装
 **2k环境不需要安装此显卡要求**
 
 #### 在线安装
-sudo aptitude install nvidia-driver-510-server nvidia-cuda-toolkit
+sudo aptitude install nvidia-driver-510-server
 
 #### 本地安装
 因此当前版本要求使用CUDA进行算法运算，需要安装测试过的显卡驱动包.  
@@ -62,7 +62,7 @@ https://ld246.com/article/1378012262086
 sudo su -
 cd ~
 # 内网或通过官方下载驱动包, 以下是官方地址
-wget https://developer.nvidia.cn/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=runfile_local
+https://developer.nvidia.cn/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=runfile_local
 
 # 禁用nouveau, 不然显卡重启动会起不来。
 cp /etc/modprobe.d/nvidia-installer-disable-nouveau.conf ~/nvidia-installer-disable-nouveau.conf
