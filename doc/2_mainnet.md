@@ -62,7 +62,8 @@ https://ld246.com/article/1378012262086
 sudo su -
 cd ~
 # 内网或通过官方下载驱动包, 以下是官方地址
-https://developer.nvidia.cn/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=runfile_local
+https://developer.nvidia.cn/cuda-11-6-2-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=runfile_local
+wget https://developer.download.nvidia.com/compute/cuda/11.6.2/local_installers/cuda_11.6.2_510.47.03_linux.run
 
 # 禁用nouveau, 不然显卡重启动会起不来。
 cp /etc/modprobe.d/nvidia-installer-disable-nouveau.conf ~/nvidia-installer-disable-nouveau.conf
