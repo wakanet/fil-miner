@@ -4,7 +4,8 @@ addr=$1
 count=0
 
 if [ -z "$addr" ]; then
-    addr="f3rhyjgokmwicrvpzsaj3pqlorlxx56xlvx5uwiaf4ljbwostwlxh6gbzl76yd2h5lljreb6j4qzpmp3hocboq"
+    echo "arg 0 for worker address is not set"
+    exit
 fi
 
 while true
