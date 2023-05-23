@@ -1,4 +1,5 @@
 ## WorkerSpace
+the root dir default is './' , the release is '/data/lotus-datacap'
 ```
 src-dir/src -- the source file directory. BE CAREFUL, it will auto remove file by the program
 src-dir/cache -- the packing cache directory, it will fetch data from src-dir
@@ -14,15 +15,20 @@ sqlite.db -- the api server database, it record the download transcation.
 lotus-datacap pack-srv # run then pack service to packing src files
 lotus-datacap car-srv # run the car service to gen car files and support car api service
 
-touch src/src.lock
-echo -ne "1" > src/src.lock # lock the src dir when download data by manually
-# download ...
-echo -ne "0" > src/src.lock # after unlock the src.lock, the pack-srv and car-srv will auto run.
+touch /data/lotus-datacap/src-dir/src/src.lock
 
-# SPEC:
+# lock
+echo -ne "1" > /data/lotus-datacap/src-dir/src/src.lock # lock the src dir when download data by manually
+
+# download files or directory to /data/lotus-datacap/src-dir/src
+
+# unlock
+echo -ne "0" > /data/lotus-datacap/src-dir/src/src.lock # after unlock the src.lock, the pack-srv and car-srv will auto run.
+
+# SPEC for restart car-srv:
 # restart car-srv
 # stop the car-srv
-# mv tar-dir/cache/* tar-dir/pack
+# mv /data/lotus-datacap/tar-dir/cache/* /data/lotus-datacap/tar-dir/pack
 # start car-srv
 
 ```
