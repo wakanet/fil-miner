@@ -1,5 +1,8 @@
 # 单机验证节点
 
+***备注:***
+开源版本请使用官方命令文档
+
 单机节点主要用于演示与示例，掌握后结合mainnet.md进行生产部署。
 
 本文档旨在构建一个最简的模拟lotus密封环境，用于学习、测试、验证lotus的使用与维护。
@@ -18,6 +21,7 @@
 - [启动wnpost工人](#启动wnpost工人)
 - [启动CC密封](#启动CC密封)
 - [启动DC密封](#启动DC密封)
+- [测试用例](#测试用例)
 
 ## 硬件要求
 2k环境
@@ -341,6 +345,24 @@ echo "$HOME/fil-miner/script/lotus/lotus.sh" >> /tmp/files.txt
 ./miner.sh storage-deals offline-make --storage-id=[1] --from [有效数据地址] /tmp/files.txt 
 ```
 
-***备注:***
-开源版本请使用官方命令文档
 
+## 测试用例
+存储说明
+```
+'nfs'存储指支持mount操作的存储，背后可以是盘、单机、集群, 要注意删除保护
+'custom'存储指需要手工挂载目录的存储，背后可以是盘、单机、集群, 要注意删除保护
+'fstar'存储指针对性开发使用bc-storage做为存储，只支持单机操作，但具有比较好的删除保护功能。
+'pb-storage'存储指针对有效数据发单机开发的pb-storage存储, 只支持单机操作，但具有比较好的分布式构建能力。
+```
+
+### http存储(staging)+NFS存储(unsealed)+NFS存储(sealed)
+此类型为全自动模式
+TODO: 用例说明
+
+### NFS存储(staging)+NFS存储(unsealed)+NFS存储(sealed)
+此类型为全自动模式, car文件向NFS存储(staging)写入，worker共享car存储目录。
+TODO: 用例说明
+
+### CUSTOM存储(staging)+CUSTOM存储(unsealed)+CUSTOM存储(sealed)
+此类型为手动模式, car文件向staging存储写入，worker共享car存储目录。
+TODO: 用例说明
