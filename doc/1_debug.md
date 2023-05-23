@@ -355,9 +355,70 @@ echo "$HOME/fil-miner/script/lotus/lotus.sh" >> /tmp/files.txt
 'pb-storage'存储指针对有效数据发单机开发的pb-storage存储, 只支持单机操作，但具有比较好的分布式构建能力。
 ```
 
+测试用例需要重置后执行, 至少保证以下进程是初始化的状态, 且已执行环境变量加载
+```
+cd ~/fil-miner
+. env.sh
+cd ~/fil-miner/script/lotus
+. env/miner-1.sh
+
+filc status
+#lotus-daemon-1
+#lotus-user-1
+#lotus-worker-t12
+#lotus-worker-c2
+#lotus-worker-wdpost
+#lotus-worker-wnpost
+```
+
 ### http存储(staging)+NFS存储(unsealed)+NFS存储(sealed)
 此类型为全自动模式
-TODO: 用例说明
+
+构建存储
+```
+sudo aptitude install nfs-server
+sudo mkdir -p /data/zfs
+sudo echo "/data/zfs *(rw,sync,insecure,no_root_squash)">>/etc/exports
+sudo systemctl reload nfs-server
+cd ~/fil-miner/script/lotus
+. env/miner-1.sh
+./init-storage-dev.sh staging pb-storage
+./init-storage-dev.sh unsealed nfs
+./init-storage-dev.sh sealed nfs
+```
+
+模拟有效数据签名地址
+```
+cd ~/fil-miner/script/lotus
+. env/miner-1.sh
+addr1=$(./lotus.sh wallet new)
+addr2=$(./lotus.sh wallet new)
+clientAddr=$addr2
+./filplus-verifreg.sh $addr1
+./filplus-grant.sh $addr1 $clientAddr
+```
+
+模拟发单机
+````
+cp ~/fil-miner/etc/supd/apps/tpl/lotus-datacap-chain.ini ~/fil-miner/etc/supd/apps/
+cp ~/fil-miner/etc/supd/apps/tpl/lotus-datacap-pack-2k.ini ~/fil-miner/etc/supd/apps/
+cp ~/fil-miner/etc/supd/apps/tpl/lotus-datacap-car-2k.ini ~/fil-miner/etc/supd/apps/
+filc reload
+filc start all
+
+touch /data/lotus-datacap/src-dir/src/src.lock
+echo -ne "1" > /data/lotus-datacap/src-dir/src/src.lock
+cp -rf ~/fil-miner/script/lotus/env /data/lotus-datacap/src/dir/src
+echo -ne "0" > /data/lotus-datacap/src-dir/src/src.lock
+```
+
+发单进行密封
+```
+cd ~/fil-miner/script/lotus
+. env/miner-1.sh
+nohup ./publish_seal_loop.sh $worker_addr >> publish.log 2>&1 &
+nohup ./deal-import-http.sh $minerAddr $clientAddr 518400 1 http://127.0.0.1:9080 >> import.log 2>&1 &
+```
 
 ### NFS存储(staging)+NFS存储(unsealed)+NFS存储(sealed)
 此类型为全自动模式, car文件向NFS存储(staging)写入，worker共享car存储目录。
