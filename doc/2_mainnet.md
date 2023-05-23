@@ -52,7 +52,7 @@ sudo aptitude install nfs-client # 按需安装
 **2k环境不需要安装此显卡要求**
 
 #### 在线安装
-sudo aptitude install nvidia-driver-510-server
+sudo aptitude install nvidia-driver-510-server nvidia-cuda-toolkit
 
 #### 本地安装
 因此当前版本要求使用CUDA进行算法运算，需要安装测试过的显卡驱动包.  
