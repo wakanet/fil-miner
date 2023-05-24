@@ -415,7 +415,7 @@ mkdir -p /data/lotus-datacap/car-dir
 echo -ne "AbcLotus123" > /data/lotus-datacap/encrypt.dat # 设定打包car的密码，若设定，须记住此密码，否则无法解密
 touch /data/lotus-datacap/src-dir/src/src.lock
 echo -ne "1" > /data/lotus-datacap/src-dir/src/src.lock
-cp -rf ~/fil-miner/script/lotus/env /data/lotus-datacap/src/dir/src
+cp -rf ~/fil-miner/script/lotus/env /data/lotus-datacap/src-dir/src
 echo -ne "0" > /data/lotus-datacap/src-dir/src/src.lock
 ```
 
@@ -424,8 +424,16 @@ echo -ne "0" > /data/lotus-datacap/src-dir/src/src.lock
 cd ~/fil-miner/script/lotus
 . env/miner-1.sh
 nohup ./publish_seal_loop.sh $worker_addr >> publish.log 2>&1 &
+
+# 调试发单, control+c退出
+sh -x ./deal-import-http.sh $minerAddr $clientAddr 518400 1 http://127.0.0.1:9080
+
+# 或
+# 产线发单
 nohup ./deal-import-http.sh $minerAddr $clientAddr 518400 1 http://127.0.0.1:9080 >> import.log 2>&1 &
 ```
+
+注意：不同的pb-storage发单脚本会不一致，请参考实际接口与源码，并修改~/fil-miner/apps/lotus/pb-cli.sh实现不同的worker上拉取操作
 
 ### NFS存储(staging)+NFS存储(unsealed)+NFS存储(sealed)
 此类型为全自动模式, car文件向NFS存储(staging)写入，worker共享car存储目录。
