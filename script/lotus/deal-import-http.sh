@@ -86,7 +86,7 @@ do
     
     echo "record-deal:"$propCid" "$output
     echo $(date --rfc-3339=ns)
-    ./miner.sh fstar-market record-deal $propCid $rootCid $pieceCid $pieceSize $clientAddr $output $remoteUrl $storage_id
+    ./miner.sh fstar-market record-deal $propCid $rootCid $pieceCid $pieceSize $clientAddr $output $remoteUrl $storageId
     if [ $? -ne 0 ]; then
       echo "record failed: $propose_out"
       continue
