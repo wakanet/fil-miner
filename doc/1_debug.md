@@ -396,6 +396,7 @@ addr2=$(./lotus.sh wallet new)
 clientAddr=$addr2
 ./filplus-verifreg.sh $addr1
 ./filplus-grant.sh $addr1 $clientAddr
+./miner.sh storage-deals set-ask --price 0.0000000 --verified-price 0.0000000 --max-piece-size 2KiB
 ```
 
 模拟发单机
@@ -406,6 +407,7 @@ cp ~/fil-miner/etc/supd/apps/tpl/lotus-datacap-car-2k.ini ~/fil-miner/etc/supd/a
 filc reload
 filc start all
 
+echo -ne "AbcLotus123" > /data/lotus-datacap/encrypt.dat # 设定打包car的密码，若设定，须记住此密码，否则无法解密
 touch /data/lotus-datacap/src-dir/src/src.lock
 echo -ne "1" > /data/lotus-datacap/src-dir/src/src.lock
 cp -rf ~/fil-miner/script/lotus/env /data/lotus-datacap/src/dir/src
