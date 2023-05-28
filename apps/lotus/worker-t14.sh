@@ -87,7 +87,8 @@ RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker -
     --parallel-unseal=0 \
     --parallel-precommit1=14 \
     --parallel-precommit2=1 \
-    --parallel-commit=0 &
+    --parallel-commit=0 \
+    --md5sum=false &
 pid=$!
 taskset -pc $cpu_bind $pid
 
