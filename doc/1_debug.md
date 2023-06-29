@@ -220,11 +220,13 @@ filc status # 确认lotus-user-1进程状态是绿的
 ## 启动存储
 ```
 # 配置nfs服务器
+sudo su -
 mkdir -p /data/zfs/lotus-user-1/staging/deal-staging
 mkdir -p /data/zfs/lotus-user-1/unseal/unsealed
 mkdir -p /data/zfs/lotus-user-1/sealed/sealed
 echo "/data/zfs *(rw,sync,insecure,no_root_squash)">>/etc/exports # 可选，若已有，不需再执行
-sudo systemctl reload nfs-server
+systemctl reload nfs-server
+exit
 
 # 初始化miner中的配置
 cd ~/fil-miner
@@ -232,7 +234,9 @@ cd ~/fil-miner
 cd script/lotus
 . env/miner-1.sh
 filc status
-./init-storage-dev.sh nfs # 详见脚本内容，会启用staging、unseal、sealed三个存储
+./init-storage-dev.sh staging pb-storage # 详见脚本内容，会启用staging、unseal、sealed三个存储
+./init-storage-dev.sh unsealed nfs # 详见脚本内容，会启用staging、unseal、sealed三个存储
+./init-storage-dev.sh sealed nfs # 详见脚本内容，会启用staging、unseal、sealed三个存储
 ./miner.sh fstar-storage status --debug 
 ```
 
