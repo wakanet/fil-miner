@@ -76,7 +76,13 @@ mkdir -p $miner_repo
 mkdir -p $storage_repo
 
 netip="`/bin/sh ./ip.sh`"
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip BELLMAN_NO_GPU=1 ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --listen-addr="$netip:1279" --id-file="$worker_id_file" --parallel-pledge=0 --parallel-precommit1=0 --parallel-precommit2=0 --parallel-commit=0 --wnpost-srv=true &
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip BELLMAN_NO_GPU=1 ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --listen-addr="$netip:1279" --id-file="$worker_id_file" \
+    --parallel-pledge=0 \
+    --parallel-unseal=0 \
+    --parallel-precommit1=0  \
+    --parallel-precommit2=0 \
+    --parallel-commit=0 \
+    --wnpost-srv=true &
 pid=$!
 
 # set ulimit for process

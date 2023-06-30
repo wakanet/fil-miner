@@ -79,7 +79,13 @@ mkdir -p $storage_repo
 netip="`/bin/sh ./ip.sh`"
 cpu_bind=$(./lotus-worker pledge --cpu-bind)
 cpu_num=$(./lotus-worker pledge --cpu-num)
-RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --listen-addr="$netip:1283" --parallel-pledge=0 --parallel-precommit1=0 --parallel-precommit2=0 --parallel-commit=0 --commit2-srv=true &
+RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker --worker-repo=$worker_repo --miner-repo=$miner_repo --storage-repo=$storage_repo run --id-file="$worker_id_file" --listen-addr="$netip:1283" \
+    --parallel-pledge=0 \
+    --parallel-unseal=0 \
+    --parallel-precommit1=0 \
+    --parallel-precommit2=0 \
+    --parallel-commit=0 \
+    --commit2-srv=true &
 pid=$!
 taskset -pc $cpu_bind $pid
 

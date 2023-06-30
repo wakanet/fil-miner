@@ -8,7 +8,7 @@ export FIL_PROOFS_MAXIMIZE_CACHING=1  # open cache for 32GB or 64GB
 export FIL_PROOFS_USE_MULTICORE_SDR=1
 export FIL_PROOFS_PARENT_CACHE="/data/cache/filecoin-parents"
 export FIL_PROOFS_PARAMETER_CACHE="/data/cache/filecoin-proof-parameters/v28" 
-#export worker_id_file="~/.lotusworker/worker-1t.id"
+export worker_id_file="~/.lotusworker/worker-unseal.id"
 export TMPDIR=/data/cache/tmp
 
 mkdir -p $TMPDIR
@@ -85,8 +85,8 @@ RUST_LOG=info RUST_BACKTRACE=1 NETIP=$netip GOMAXPROCS=$cpu_num ./lotus-worker -
     --listen-addr="$netip:2286" \
     --max-tasks=24 \
     --parallel-pledge=0 \
-    --parallel-unseal=12 \
     --parallel-precommit1=0 \
+    --parallel-unseal=12 \
     --parallel-precommit2=0 \
     --parallel-commit=0 \
     --md5sum=true &
