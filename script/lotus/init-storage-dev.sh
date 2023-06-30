@@ -2,12 +2,12 @@
 
 kind=$1
 if [ -z "$kind" ]; then
-    echo "need input second argument 'staging' or 'unsealed' or 'sealed'" for kind
+    echo "need input first argument 'staging' or 'unsealed' or 'sealed'" for kind
     exit
 fi
 mode=$2
 if [ -z "$mode" ]; then
-    echo "need input first argument 'custom' or 'nfs' or 'fstar'" or 'pb-storage' for mode
+    echo "need input second argument 'custom' or 'nfs' or 'fstar'" or 'pb-storage' for mode
     exit
 fi
 

@@ -82,7 +82,7 @@ do
     
     output=$(./miner.sh fstar-market new-fstmp --really-do-it)
     filename=$(basename $output)
-    touch $output # make a empty fsmtp
+    sudo touch $output # make a empty fsmtp
     
     echo "record-deal:"$propCid" "$output
     echo $(date --rfc-3339=ns)
