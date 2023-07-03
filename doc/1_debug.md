@@ -317,10 +317,10 @@ cd script/lotus
 ./lotus.sh wallet import t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy-dev.dat
 ./lotus.sh wallet new # 创建公证人地址
 sudo lotus send [公证人地址] 10
-./shed.sh verifreg add-verifier t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy [公证人地址] 1024000 # 添加公证人或者./verifreg.sh [公证人地址]
+./shed.sh verifreg add-verifier t14po2vrupy7buror4g55c7shlcrmwsjxbpss7dzy [公证人地址] 1024000 # 添加公证人或者./filplus-verifreg.sh [公证人地址]
 ./lotus.sh wallet new # 创建一个有效数据客户端地址
 sudo lotus send [客户端地址] 10000 # 从水龙头处获得点钱
-./lotus.sh filplus grant-datacap --from [公证人地址] [客户端地址] 10240 # 或者./filplus-grant [公证人地址] [客户端地址]
+./lotus.sh filplus grant-datacap --from [公证人地址] [客户端地址] 10240 # 或者./filplus-grant.sh [公证人地址] [客户端地址]
 ```
 
 ### 选择DC的缓存存储
@@ -435,6 +435,18 @@ sh -x ./deal-import-http.sh $minerAddr $clientAddr 518400 1 http://127.0.0.1:908
 # 或
 # 产线发单
 nohup ./deal-import-http.sh $minerAddr $clientAddr 518400 1 http://127.0.0.1:9080 >> import.log 2>&1 &
+```
+
+升级扇区
+```
+cd ~/fil-miner/script/lotus
+. env/miner-1.sh
+./miner.sh sectors status [sectorNum] # 获得当前的扇区结束epoch
+./miner.sh sectors extend --new-expiration=[end_epoch] [sectorNum] # 扇区结束的时间，不能小于有效扇区需要的有效期
+./miner.sh sectors snap-up [sectorNum]
+
+# 调试发单填充cc扇区, control+c退出
+sh -x ./deal-import-http.sh $minerAddr $clientAddr 518400 1 http://127.0.0.1:9080
 ```
 
 注意：不同的pb-storage发单脚本会不一致，请参考实际接口与源码，并修改~/fil-miner/apps/lotus/pb-cli.sh实现不同的worker上拉取操作
