@@ -21,6 +21,7 @@
 - [启动wnpost工人](#启动wnpost工人)
 - [启动CC密封](#启动CC密封)
 - [启动DC密封](#启动DC密封)
+- [扇区重算](#扇区重算)
 - [测试用例](#测试用例)
 
 ## 硬件要求
@@ -349,6 +350,32 @@ echo "$HOME/fil-miner/script/lotus/lotus.sh" >> /tmp/files.txt
 ./miner.sh storage-deals offline-make --storage-id=[1] --from [有效数据地址] /tmp/files.txt 
 ```
 
+## 扇区重算
+
+### 离线重算
+```
+cd ~/fil-miner
+. env.sh
+
+cd ~/fil-miner/script/lotus
+./miner.sh sectors status --on-chain-info --json 0 # 取出信息填写rebuild.txt
+# "SealProof": 5, # 9,64GiBV1_1;8,32GiBV1_1;7,512MiBV1_1; 5, 2KiBV1_1; 4-0, 64GiBV1-2KiBV1
+# {
+#   "Deals":[11,0,0],
+#   "PieceInfo":[{"Size":512,"PieceCID":{"/":"baga6ea4seaqbev5pbjybhu7st45jiisackmgvft2gdsb3c3gyybp4rxomau3qmi"}},{"Size":512,"PieceCID":{"/":"baga6ea4seaqfpirydiugkk7up5v666wkm6n6jlw6lby2wxht5mwaqekerdfykjq"}},{"Size":1024,"PieceCID":{"/":"baga6ea4seaqb66wjlfkrbye6uqoemcyxmqylwmrm235uclwfpsyx3ge2imidoly"}}],
+#   "ProofType":5,
+#   "SectorName":"s-todo-0",
+#   "SectorNumber":0,
+#   "SeedValue":"05qVzBmoWIQdeGzdGX9vcz/lb1054uRpTMkreXm3JWA=",
+#   "Status":"Proving",
+#   "TicketValue":"W5fO46KeXS3+TkPi3mCuuuhYF1uUcHbpJvCj+hDO3XQ="
+# }
+
+~/fil-miner/apps/lotus/lotus-worker rebuild --only-template>./rebuild.txt # 将以上得到的重算信息填写rebuild.txt
+mkdir -p /data/cache/rebuild/unsealed
+cp [unsealed src] /data/cache/rebuild/unsealed
+./rebuild.sh
+```
 
 ## 测试用例
 存储说明

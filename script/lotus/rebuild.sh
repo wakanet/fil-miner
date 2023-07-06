@@ -7,6 +7,9 @@ export FIL_PROOFS_USE_MULTICORE_SDR=1
 export FIL_PROOFS_PARENT_CACHE="/data/cache/filecoin-parents"
 export FIL_PROOFS_PARAMETER_CACHE="/data/cache/filecoin-proof-parameters/v28" 
 export TMPDIR=/data/cache/tmp
+export worker_repo="/data/cache/rebuild"
+export sector_size="2048"
+export sector_head="s-f"
 
 mkdir -p $TMPDIR
 
@@ -51,7 +54,7 @@ fi
 cpu_bind=$($PRJ_ROOT/apps/lotus/lotus-worker pledge --cpu-bind)
 cpu_num=$($PRJ_ROOT/apps/lotus/lotus-worker pledge --cpu-num)
 export LOTUS_P2_L3_NUM=2
-RUST_LOG=info RUST_BACKTRACE=1 GOMAXPROCS=$cpu_num $PRJ_ROOT/apps/lotus/lotus-worker --worker-repo=/data/cache/rebuild rebuild ./rebuild.txt &
+RUST_LOG=info RUST_BACKTRACE=1 GOMAXPROCS=$cpu_num $PRJ_ROOT/apps/lotus/lotus-worker --worker-repo=$worker_repo rebuild --sector-size=$sector_size --sector-head=$sector_head ./rebuild.txt &
 pid=$!
 taskset -pc $cpu_bind $pid
 
