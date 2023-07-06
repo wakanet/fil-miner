@@ -441,12 +441,20 @@ nohup ./deal-import-http.sh $minerAddr $clientAddr 518400 1 http://127.0.0.1:908
 ```
 cd ~/fil-miner/script/lotus
 . env/miner-1.sh
-./miner.sh sectors status [sectorNum] # 获得当前的扇区结束epoch
+./miner.sh sectors list --really-do-it>>sectors.txt # 获得当前的扇区结束epoch
 ./miner.sh sectors extend --new-expiration=[end_epoch] [sectorNum] # 扇区结束的时间，不能小于有效扇区需要的有效期
 ./miner.sh sectors snap-up [sectorNum]
 
 # 调试发单填充cc扇区, control+c退出
-sh -x ./deal-import-http.sh $minerAddr $clientAddr 518400 1 http://127.0.0.1:9080
+sh -x ./deal-import-http.sh $minerAddr $clientAddr [cc到期height-当前height-72小时epoch] 1 http://127.0.0.1:9080
+
+# 会执行：
+# AddPiece
+# ReplicaUpdate
+# ProveReplicaUpdate1
+# ProveReplicaUpdate2 
+# ReleaseUnsealed
+# FinalizeReplicaUpdate
 ```
 
 注意：不同的pb-storage发单脚本会不一致，请参考实际接口与源码，并修改~/fil-miner/apps/lotus/pb-cli.sh实现不同的worker上拉取操作
