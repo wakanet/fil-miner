@@ -691,13 +691,15 @@ WaitDealsDelay = "12h0m0s"
 
 
 [Storage]
-
 #  For fstar-work
 RemoteWorkerSeal = true
 RemoteWorkerWnPoSt = 2
 RemoteWorkerWdPoSt = 2
 ForceRemoteWdPoSt = false
 ForceRemoteWdPostPart=4
+KeepRemoteUnsealed = true # overwrite the AlwaysKeepUnsealedCopy
+# fstar-worker end
+
   # type: int
   # env var: LOTUS_STORAGE_PARALLELFETCHLIMIT
   #ParallelFetchLimit = 10
